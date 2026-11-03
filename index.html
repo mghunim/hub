@@ -203,6 +203,14 @@ textarea.in{min-height:110px;resize:vertical;line-height:1.45}
 @media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .wa{background:#0F2F22;color:#9BE3BD;border-color:#1F5A3E}}
 :root[data-theme="dark"] .wa{background:#0F2F22;color:#9BE3BD;border-color:#1F5A3E}
 .wa.fb{background:#E8F0FE;color:#0B4FB3;border-color:#C6D8FA}.wa.fb svg{color:#1877F2}
+.scanbox{position:relative;width:100%;aspect-ratio:1;border-radius:22px;overflow:hidden;background:#0B1A2A;margin-bottom:14px}
+.scanbox video{width:100%;height:100%;object-fit:cover;display:block}
+.scanframe{position:absolute;inset:16%;border:4px solid #fff;border-radius:20px;box-shadow:0 0 0 999px rgba(0,0,0,.35);pointer-events:none}
+.scanidle{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;color:#fff;text-align:center;gap:8px;padding:20px;font-weight:700}
+.scanidle svg{width:46px;height:46px}
+.verdict{border-radius:22px;padding:24px 18px;display:flex;flex-direction:column;align-items:center;gap:6px;color:#fff;margin-bottom:14px;text-align:center}
+.verdict.ok{background:#1E9E57}.verdict.no{background:#D64545}.verdict svg{width:60px;height:60px;stroke-width:3}.verdict b{font-size:25px}.verdict span{font-weight:700}
+.kv2{display:grid;grid-template-columns:1fr 1fr;gap:10px}.kv2 small{display:block;color:var(--muted);font-size:12px;font-weight:700}.kv2 b{font-size:15px}
 [dir=rtl] svg.flip{transform:scaleX(-1)}
 [dir=rtl] .sel svg{right:auto;left:18px}
 [dir=rtl] .sel select{padding-right:20px;padding-left:48px}
@@ -402,7 +410,13 @@ const AR={
 "In progress":"جاري التنفيذ","Closed":"مغلق","Unpaid":"غير مدفوعة","Paid":"مدفوعة","Today":"اليوم","Yesterday":"أمس","{n} days ago":"منذ {n} يوم",
 "Security":"الأمن","Cleanliness":"النظافة","Landscaping":"الزراعة والحدائق","Noise":"الإزعاج","Parking":"المواقف والجراجات","Facilities":"المرافق","Other":"أخرى",
 "Hello, I'm {n} from {c} · Unit {u}.":"السلام عليكم، أنا {n} من {c} · وحدة {u}.","Contact management on WhatsApp":"تواصل مع الإدارة على واتساب",
-"Choose your language":"اختر اللغة","National ID number (14 digits)":"الرقم القومي (١٤ رقم)","Enter your 14-digit national ID number.":"اكتب الرقم القومي كاملًا (١٤ رقمًا).","This national ID number is not valid.":"الرقم القومي غير صحيح.","National ID":"الرقم القومي","Waiting for approval":"في انتظار الموافقة","Under review":"قيد المراجعة","Not approved":"لم تتم الموافقة",
+"Choose your language":"اختر اللغة","Gate scanner":"ماسح البوابة","Scan a guest pass or resident badge":"امسح تصريح ضيف أو بطاقة ساكن","Start scanning":"ابدأ المسح","Stop camera":"إيقاف الكاميرا",
+"Or enter the code manually":"أو أدخل الرمز يدويًا","Check code":"تحقق من الرمز","Recent scans":"آخر عمليات المسح","No scans yet.":"لا توجد عمليات مسح بعد.","Entry allowed":"مسموح بالدخول","Entry not allowed":"غير مسموح بالدخول",
+"Code not recognised":"رمز غير معروف","Pass or badge not found":"التصريح أو البطاقة غير موجودة","Unit not approved":"الوحدة غير معتمدة","Pass is for a later date":"التصريح لتاريخ لاحق","Pass expired":"انتهت صلاحية التصريح","Pass already used":"تم استخدام التصريح من قبل",
+"Scan next":"مسح التالي","Camera not available. Allow camera access in your browser settings.":"الكاميرا غير متاحة. اسمح للمتصفح باستخدام الكاميرا من الإعدادات.","Guest pass":"تصريح ضيف","Resident badge":"بطاقة ساكن","Car plate":"لوحة السيارة","Allowed":"مسموح","Not allowed":"غير مسموح",
+"Security staff":"فريق الأمن","Security staff only see the gate scanner.":"يرى فريق الأمن ماسح البوابة فقط.","Security Gmail":"بريد Gmail لفرد الأمن","Add security":"إضافة فرد أمن","Security added. They see the gate scanner when they sign in with this Gmail.":"تمت الإضافة، وسيظهر له ماسح البوابة عند تسجيل الدخول بهذا البريد.",
+"Remove from security?":"إزالة من فريق الأمن؟","They will lose access to the gate scanner.":"لن يتمكن من استخدام ماسح البوابة.","Removed":"تمت الإزالة","Security":"الأمن",
+"Personal photo":"صورة شخصية","Add your personal photo to create your ID badge.":"أضف صورتك الشخصية لإنشاء بطاقة الهوية.","Take or choose a clear photo of your face.":"التقط أو اختر صورة واضحة لوجهك.","Add photo":"إضافة صورة","Change photo":"تغيير الصورة","National ID number (14 digits)":"الرقم القومي (١٤ رقم)","Enter your 14-digit national ID number.":"اكتب الرقم القومي كاملًا (١٤ رقمًا).","This national ID number is not valid.":"الرقم القومي غير صحيح.","National ID":"الرقم القومي","Waiting for approval":"في انتظار الموافقة","Under review":"قيد المراجعة","Not approved":"لم تتم الموافقة",
 "The app unlocks after the management approves your unit.":"سيُتاح التطبيق بعد موافقة الإدارة على الوحدة.","Upload the remaining documents first.":"يُرجى رفع المستندات المتبقية أولًا.",
 "All documents uploaded. The management is reviewing them.":"تم رفع جميع المستندات، والإدارة تراجعها الآن.","Check status":"تحديث الحالة","Still waiting for approval":"ما زال الطلب في انتظار الموافقة",
 "Contact the management if you think this is a mistake.":"تواصل مع الإدارة إذا كنت ترى أن هناك خطأ.","Register another unit":"تسجيل وحدة آخر","Facebook group":"مجموعة فيسبوك","Join our Facebook group":"انضم إلى مجموعة الكمبوند على فيسبوك","News, photos and discussions":"أخبار وصور ونقاشات السكان","Facebook group link":"رابط مجموعة فيسبوك","Residents ({n})":"السكان ({n})","Edit":"تعديل","Edit resident":"تعديل بيانات الساكن","Remove resident?":"إزالة الساكن؟",
@@ -415,6 +429,7 @@ const AR={
 "Enter a valid Gmail address":"اكتب عنوان جيميل صحيح","Only people you add here can manage the app.":"الأشخاص الذين تضيفهم هنا فقط يمكنهم إدارة التطبيق.",
 "Register your unit":"سجّل وحدتك","Add another unit":"إضافة وحدة أخرى","Request":"طلب","Requested {d}":"بتاريخ {d}",
 };
+Object.assign(AR,{});
 const t=(s,v={})=>{let r=(LANG==="ar"&&AR[s])||s;for(const k in v)r=r.replace("{"+k+"}",v[k]);return r};
 function applyLang(){document.documentElement.lang=LANG;document.documentElement.dir=LANG==="ar"?"rtl":"ltr"}
 applyLang();
@@ -447,6 +462,7 @@ const WA='<svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 20l1
 /* ---------- state ---------- */
 const D={session:null,profile:null,communities:[],units:[],updates:[],requests:[],complaints:[],passes:[],notes:[],violations:[],notifs:[],m:{units:[],requests:[],complaints:[]}};
 const isMgr=()=>D.profile?.role==="manager";
+const isSec=()=>D.profile?.role==="security";
 const unit=()=>D.units.find(u=>u.id===lsGet("hub-active"))||D.units.find(u=>u.status!=="rejected")||D.units[0];
 const comm=()=>{const u=unit();return u?D.communities.find(c=>c.id===u.community_id):null};
 const unitLabel=u=>u?t("Unit {u}",{u:u.unit_no}):t("No unit yet");
@@ -457,7 +473,7 @@ async function load(){
   const [profile,communities,units,updates,requests,complaints,passes,notes,violations,notifs]=await Promise.all([
     q(sb.from("profiles").select("*").eq("id",id).single()),
     q(sb.from("communities").select("*").order("district").order("name")),
-    q(sb.from("units").select("*, communities(name,district)").eq("user_id",id).order("created_at")),
+    q(sb.from("units").select("*, communities(name,district), unit_documents(id,kind,path)").eq("user_id",id).order("created_at")),
     q(sb.from("updates").select("*, communities(name)").order("created_at",{ascending:false}).limit(60)),
     q(sb.from("requests").select("*, units(unit_no)").eq("user_id",id).order("created_at",{ascending:false})),
     q(sb.from("complaints").select("*, units(unit_no)").eq("user_id",id).order("created_at",{ascending:false})),
@@ -469,6 +485,7 @@ async function load(){
   Object.assign(D,{profile,communities,units,updates,requests,complaints,passes,notes,notifs,violations:violations.filter(v=>v.units?.user_id===id)});
   if(profile.lang&&!lsGet("hub-lang")&&profile.lang!==LANG){LANG=profile.lang;applyLang()}
   if(isMgr())await loadMgr();
+  if(isSec())D.scans=await q(sb.from("gate_scans").select("*").order("created_at",{ascending:false}).limit(20));
 }
 async function loadMgr(){
   const [units,requests,complaints]=await Promise.all([
@@ -477,23 +494,49 @@ async function loadMgr(){
     q(sb.from("complaints").select("*, units(unit_no, communities(name)), profiles(full_name,phone)").neq("status","Closed").order("created_at",{ascending:false})),
   ]);
   try{D.mgrs=await q(sb.rpc("list_managers"))}catch(e){D.mgrs=[]}
+  try{D.secs=await q(sb.rpc("list_security"))}catch(e){D.secs=[]}
   D.m={units,requests,complaints};
 }
 
+/* ---------- documents ---------- */
+const DOC_KINDS=[["national_id","National ID card","Front side photo, clear and readable.","badge"],["contract","Allocation letter / contract","Photo or PDF of the allocation letter or contract.","book"],["maintenance_receipt","Last maintenance fee receipt","Photo or PDF of the latest receipt.","clip"]];
+const docsOf=u=>u?.unit_documents||[];
+const docCount=u=>new Set(docsOf(u).filter(d=>d.kind!=="personal_photo").map(d=>d.kind)).size;
+async function shrink(file){
+  if(!/^image\/(jpeg|png|webp)$/.test(file.type))return file;
+  try{const img=await createImageBitmap(file);const m=2000,sc=Math.min(1,m/Math.max(img.width,img.height));
+    const c=document.createElement("canvas");c.width=Math.round(img.width*sc);c.height=Math.round(img.height*sc);c.getContext("2d").drawImage(img,0,0,c.width,c.height);
+    const b=await new Promise(r=>c.toBlob(r,"image/jpeg",.82));return b&&b.size<file.size?new File([b],"doc.jpg",{type:"image/jpeg"}):file}catch(e){return file}}
+async function uploadDoc(input){
+  const file=input.files[0];if(!file)return;const kind=input.dataset.doc,unitId=input.dataset.unit;
+  const lbl=input.closest("label");if(lbl)lbl.firstChild.textContent=t("Uploading…");
+  try{const f=await shrink(file);if(f.size>10485760){toast(t("File is larger than 10 MB"));return render()}
+    const ext=(f.type==="application/pdf"?"pdf":(f.name.split(".").pop()||"jpg")).toLowerCase().replace(/[^a-z0-9]/g,"")||"jpg";
+    const path=`${D.profile.id}/${unitId}/${kind}-${Date.now()}.${ext}`;
+    const up=await sb.storage.from("unit-docs").upload(path,f,{contentType:f.type||"application/octet-stream",upsert:false});if(up.error)throw up.error;
+    const old=D.units.find(u=>u.id===unitId)?.unit_documents?.filter(d=>d.kind===kind)||[];
+    await q(sb.from("unit_documents").insert({unit_id:unitId,kind,path}));
+    for(const o of old){await sb.from("unit_documents").delete().eq("id",o.id);await sb.storage.from("unit-docs").remove([o.path])}
+    await load();render();toast(t("Uploaded"))}catch(e){toast(e.message||t("Something went wrong"));render()}}
+async function openDoc(path){sheet(t("Document"),`<p class="sub">${t("Loading…")}</p>`);
+  const {data,error}=await sb.storage.from("unit-docs").createSignedUrl(path,900);if(error){closeSheet();return toast(error.message)}
+  const u=data.signedUrl,pdf=/\.pdf$/i.test(path);const box=document.querySelector("#sheetIn .sb");if(!box)return;
+  box.innerHTML=(pdf?`<div class="empty" style="padding:24px 10px">${I("book")}PDF</div>`:`<a href="${u}" target="_blank" rel="noopener"><img src="${u}" alt="" style="width:100%;max-height:60vh;object-fit:contain;border-radius:12px;display:block;margin-bottom:12px;background:var(--field)"></a>`)
+   +`<a class="btn" href="${u}" target="_blank" rel="noopener">${pdf?t("Open PDF"):t("Open in full screen")}</a><div style="height:10px"></div><button class="btn ghost" data-a="closeSheet">${t("Close")}</button>`}
 /* ---------- navigation ---------- */
 let stack=[],route={name:"loading"},tmp={};
 function go(name,params={},push=true){if(push&&route)stack.push(route);route={name,...params};closeDrawer();render()}
-function back(){route=stack.pop()||{name:isMgr()&&!unit()?"manager":"home"};render()}
-function home(tab){stack=[];route={name:tab||(isMgr()&&!unit()?"manager":"home")};render()}
-function needsProfile(){const p=D.profile;return !p.full_name||!p.phone||(!isMgr()&&!p.relation)}
+function back(){route=stack.pop()||{name:isSec()?"scan":isMgr()&&!unit()?"manager":"home"};render()}
+function home(tab){stack=[];route={name:tab||(isSec()?"scan":isMgr()&&!unit()?"manager":"home")};render()}
+function needsProfile(){const p=D.profile;return !p.full_name||!p.phone||(p.role==="resident"&&!p.relation)}
 async function boot(){
   route={name:"loading"};render();
   const {data}=await sb.auth.getSession();D.session=data.session;
   if(!D.session){route={name:"welcome"};return render()}
   try{await load()}catch(e){route={name:"error",msg:e.message};return render()}
   if(needsProfile())route={name:"profile"};
-  else if(!isMgr()&&!D.units.length)route={name:"community"};
-  else route={name:isMgr()&&!unit()?"manager":"home"};
+  else if(D.profile.role==="resident"&&!D.units.length)route={name:"community"};
+  else route={name:isSec()?"scan":isMgr()&&!unit()?"manager":"home"};
   render();
 }
 async function refresh(){try{await load();render()}catch(e){toast(e.message)}}
@@ -605,6 +648,40 @@ V.gate=()=>{const c=D.communities.find(x=>D.units.some(u=>u.community_id===x.id)
   <div style="display:flex;gap:10px;margin-top:18px"><button class="btn ghost" data-a="addUnit">${I("plus")}${t("Register another unit")}</button></div>
   <button class="btn danger" data-a="logout" style="margin-top:10px">${t("Sign out")}</button>
  </div>`};
+const REASON={unknown_code:"Code not recognised",not_found:"Pass or badge not found",unit_not_approved:"Unit not approved",not_yet:"Pass is for a later date",expired:"Pass expired",already_used:"Pass already used"};
+function resultCard(r){const ok=r.ok;const kv=(l,v)=>v?`<div><small>${t(l)}</small><b>${esc(v)}</b></div>`:"";
+ return `<div class="verdict ${ok?"ok":"no"}">${I(ok?"check":"x")}<b>${ok?t("Entry allowed"):t("Entry not allowed")}</b>${ok?"":`<span>${t(REASON[r.reason]||"Not allowed")}</span>`}</div>
+ <div class="post"><small class="sub">${r.kind==="badge"?t("Resident badge"):r.kind==="pass"?t("Guest pass"):""}</small>
+  ${r.kind==="badge"?`<div style="display:flex;gap:14px;align-items:center;margin:8px 0 12px">${r.photo?`<img id="scph" alt="" style="width:110px;height:110px;border-radius:18px;object-fit:cover;background:var(--field);flex:none">`:`<span class="avatar lg">${initials(r.resident)}</span>`}<div><b style="display:block;font-size:21px">${esc(r.resident||"—")}</b><span class="sub">${esc(t(r.relation||""))}</span></div></div>`
+   :r.kind==="pass"?`<b style="display:block;font-size:21px;margin:6px 0 12px">${esc(r.guest||"—")}</b>`:""}
+  <div class="kv2">${kv("Unit",r.unit)}${r.kind==="pass"?kv("Resident",r.resident):""}${kv("Community",r.community)}${r.kind==="pass"?kv("Valid for",r.valid_for?t(r.valid_for):"")+kv("Date",r.visit_date?fmtDate(r.visit_date):"")+kv("Car plate",r.car_plate):""}</div></div>
+ <button class="btn" data-a="scanNext">${t("Scan next")}</button>`}
+V.scan=()=>{const r=tmp.scanRes;
+ return `<header class="top"><button class="iconbtn" data-a="langSheet" aria-label="${t("Language")}">${I("compass")}</button><h1>${t("Gate scanner")}</h1><button class="iconbtn" data-a="go" data-v="profileView" aria-label="${t("My account")}">${I("user")}</button></header>
+ <div class="body">
+ ${r?resultCard(r):`<div class="scanbox"><video id="scv" playsinline muted></video><div class="scanframe"></div>${tmp.camOn?"":`<div class="scanidle">${I("badge")}<p>${t("Scan a guest pass or resident badge")}</p></div>`}</div>
+  <button class="btn ${tmp.camOn?"ghost":""}" data-a="${tmp.camOn?"stopCam":"startCam"}">${tmp.camOn?t("Stop camera"):t("Start scanning")}</button>
+  <div class="field" style="margin-top:16px"><label for="sc-man">${t("Or enter the code manually")}</label><input class="in" id="sc-man" dir="ltr" placeholder="HUB-PASS:…" autocomplete="off"></div>
+  <button class="btn ghost" data-a="manualCode">${t("Check code")}</button>`}
+ <div class="sec"><h2>${t("Recent scans")}</h2></div>
+ ${(D.scans||[]).map(x=>`<div class="row">${I(x.allowed?"check":"x")}<div class="t"><b>${esc(x.label||t("Code not recognised"))}</b><span>${x.allowed?t("Allowed"):t(REASON[x.reason]||"Not allowed")} · ${new Date(x.created_at).toLocaleString(LANG==="ar"?"ar-EG":"en-GB",{hour:"2-digit",minute:"2-digit",day:"numeric",month:"short"})}</span></div></div>`).join("")||empty("gate",t("No scans yet."))}
+ </div>`};
+let camStream=null,camTimer=null;
+const myPhoto=u=>(u?.unit_documents||[]).filter(d=>d.kind==="personal_photo").slice(-1)[0];
+async function signed(path){try{const {data}=await sb.storage.from("unit-docs").createSignedUrl(path,900);return data?.signedUrl}catch(e){return null}}
+async function loadJsQR(){if(window.jsQR)return;await new Promise((res,rej)=>{const sc=document.createElement("script");sc.src="https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.js";sc.onload=res;sc.onerror=rej;document.head.appendChild(sc)})}
+async function startCam(){
+ try{await loadJsQR();camStream=await navigator.mediaDevices.getUserMedia({video:{facingMode:{ideal:"environment"}},audio:false});
+  tmp.camOn=true;tmp.scanRes=null;render();const v=document.getElementById("scv");v.srcObject=camStream;await v.play();
+  const c=document.createElement("canvas"),x=c.getContext("2d",{willReadFrequently:true});
+  const tick=()=>{if(!camStream)return;if(v.readyState>=2&&v.videoWidth){const sc=Math.min(1,640/v.videoWidth);c.width=Math.round(v.videoWidth*sc);c.height=Math.round(v.videoHeight*sc);x.drawImage(v,0,0,c.width,c.height);
+    const img=x.getImageData(0,0,c.width,c.height);const code=jsQR(img.data,c.width,c.height,{inversionAttempts:"dontInvert"});if(code&&code.data){stopCam(true);checkCode(code.data);return}}
+   camTimer=requestAnimationFrame(tick)};tick()}
+ catch(e){stopCam(true);tmp.camOn=false;render();toast(t("Camera not available. Allow camera access in your browser settings."))}}
+function stopCam(silent){if(camTimer)cancelAnimationFrame(camTimer);camTimer=null;if(camStream){camStream.getTracks().forEach(k=>k.stop());camStream=null}tmp.camOn=false;if(!silent)render()}
+async function checkCode(code){try{const {data,error}=await sb.rpc("verify_code",{p_code:String(code).trim()});if(error)throw error;tmp.scanRes=data;
+  try{if(navigator.vibrate)navigator.vibrate(data.ok?120:[80,60,80,60,80])}catch(e){}
+  D.scans=await q(sb.from("gate_scans").select("*").order("created_at",{ascending:false}).limit(20))}catch(e){toast(e.message||t("Something went wrong"))}render()}
 V.updates=()=>`${topbar(t("Community Updates"))}<div class="body">${myUpdates().map(postHTML).join("")||empty("megaphone",t("No updates yet."))}</div>`;
 
 const typeOf=id=>[...REQUEST_TYPES,...SERVICES].find(x=>x.id===id)||{en:id,ar:id};
@@ -627,14 +704,16 @@ V.discover=()=>{const c=comm();return `${topbar(t("Discover"),{noBack:true})}<di
  <div class="grid2">${[["Short numbers","phone","var(--teal)","directory"],["Community guidelines","book","var(--coral)","guidelines"],["Help Center","help","var(--amber)","help"],["My properties","building","var(--ink)","properties"]].map(([l,ic,col,to])=>`<button class="tile" style="min-height:120px" data-a="go" data-v="${to}"><span class="art" style="background:color-mix(in srgb,${col} 16%,transparent);color:${col}">${I(ic)}</span><b>${t(l)}</b></button>`).join("")}</div>
  </div>${tabs("discover")}`};
 
-V.badge=()=>{const u=unit();if(!u)return `${topbar(t("Identity Badge"))}<div class="body">${needUnit()}</div>`;const ok=u.status==="approved";return `${topbar(t("Identity Badge"))}<div class="body">
+V.badge=()=>{const u=unit();if(!u)return `${topbar(t("Identity Badge"))}<div class="body">${needUnit()}</div>`;const ok=u.status==="approved";const ph=myPhoto(u);
+ const photoInput=`<input type="file" accept="image/*" capture="user" data-doc="personal_photo" data-unit="${u.id}" hidden>`;
+ return `${topbar(t("Identity Badge"))}<div class="body">
  ${ok?"":`<div class="banner" style="margin:0 0 14px">${I("alert")}<span>${t("Your badge activates after the management approves {u}.",{u:esc(unitLabel(u))})}</span></div>`}
- <div class="badge" style="${ok?"":"opacity:.55"}">
-  <div style="display:flex;gap:12px;align-items:center"><span class="avatar lg" style="background:var(--bg);color:var(--ink)">${initials(D.profile.full_name)}</span><div><small>${t("Resident")}</small><b style="display:block;font-size:20px">${esc(D.profile.full_name)}</b><span style="opacity:.8;font-weight:700">${esc(t(D.profile.relation||""))}</span></div></div>
-  ${ok?'<div class="qr" id="qr"></div>':""}
+ ${ok&&!ph?`<div class="post" style="text-align:center;padding:22px 18px;margin-bottom:14px"><div style="width:92px;height:92px;border-radius:50%;background:var(--field);display:grid;place-items:center;margin:0 auto 12px;color:var(--muted)">${I("user")}</div><b style="font-size:17px;display:block;margin-bottom:6px">${t("Add your personal photo to create your ID badge.")}</b><p class="sub" style="margin:0 0 14px">${t("Take or choose a clear photo of your face.")}</p><label class="btn" style="cursor:pointer">${I("plus")}${t("Add photo")}${photoInput}</label></div>`:""}
+ <div class="badge" style="${ok&&ph?"":"opacity:.55"}">
+  <div style="display:flex;gap:14px;align-items:center">${ph?`<img id="bdph" alt="" style="width:84px;height:84px;border-radius:18px;object-fit:cover;background:var(--bg);flex:none">`:`<span class="avatar lg" style="background:var(--bg);color:var(--ink)">${initials(D.profile.full_name)}</span>`}<div><small>${t("Resident")}</small><b style="display:block;font-size:20px">${esc(D.profile.full_name)}</b><span style="opacity:.8;font-weight:700">${esc(t(D.profile.relation||""))}</span></div></div>
+  ${ok&&ph?'<div class="qr" id="qr"></div>':""}
   <div class="kv"><div><small>${t("Community")}</small><b>${esc(u.communities?.name)}</b></div><div><small>${t("Unit")}</small><b>${esc(u.unit_no)}</b></div><div><small>${t("Badge no.")}</small><b>${esc(u.id.slice(0,8).toUpperCase())}</b></div><div><small>${t("Status")}</small><b>${ok?t("Active"):t(LBL[u.status])}</b></div></div>
- </div>${ok?`<p class="note">${t("Show this QR code to security at the gate.")}</p>`:""}</div>`};
-
+ </div>${ok&&ph?`<p class="note">${t("Show this QR code to security at the gate.")}</p><div style="text-align:center"><label class="link" style="cursor:pointer">${t("Change photo")}${photoInput}</label></div>`:""}</div>`};
 V.gatepass=()=>`${topbar(t("Gate Pass"))}<div class="body">
  <button class="btn cta" data-a="newPass" style="margin:6px 0 20px">${I("plus")}${t("Create new gate pass")}</button>
  ${D.passes.map(p=>`<button class="row" data-a="showPass" data-v="${p.id}"><span class="avatar">${initials(p.guest)}</span><div class="t"><b>${esc(p.guest)}</b><span>${fmtDate(p.visit_date)} · ${esc(t(p.valid_for))}${p.car_plate?" · "+t("Car")+" "+esc(p.car_plate):""}</span></div>${I("right","flip")}</button>`).join("")||empty("ticket",t("No gate passes yet. Create one to invite a guest."))}</div>`;
@@ -716,7 +795,9 @@ V.manager=()=>{if(!isMgr())return V.home();
   inner=`<p class="sub" style="margin:0 0 12px">${t("Only people you add here can manage the app.")}</p>
   <div class="field"><label for="m-em">${t("Manager's Gmail")}</label><input class="in" id="m-em" type="email" dir="ltr" placeholder="name@gmail.com" autocomplete="off"></div>
   <button class="btn" data-a="addMgr">${I("plus")}${t("Add manager")}</button>
-  <div class="sec"><h2>${t("Managers")}</h2></div>`+(D.mgrs||[]).map(m=>`<div class="row"><span class="avatar">${esc((m.email||"?")[0].toUpperCase())}</span><div class="t"><b dir="ltr" style="text-align:start">${esc(m.email)}</b><span>${m.email===me?t("You"):(m.signed_up?t("Signed up"):t("Not signed up yet"))}</span></div>${m.email===me?pill("Active"):`<button class="btn small ghost" data-a="askDelMgr" data-v="${esc(m.email)}">${t("Remove")}</button>`}</div>`).join("")}
+  <div class="sec"><h2>${t("Managers")}</h2></div>`+(D.mgrs||[]).map(m=>`<div class="row"><span class="avatar">${esc((m.email||"?")[0].toUpperCase())}</span><div class="t"><b dir="ltr" style="text-align:start">${esc(m.email)}</b><span>${m.email===me?t("You"):(m.signed_up?t("Signed up"):t("Not signed up yet"))}</span></div>${m.email===me?pill("Active"):`<button class="btn small ghost" data-a="askDelMgr" data-v="${esc(m.email)}">${t("Remove")}</button>`}</div>`).join("")+`<div class="sec"><h2>${t("Security staff")}</h2></div><p class="sub" style="margin:0 0 12px">${t("Security staff only see the gate scanner.")}</p>
+  <div class="field"><label for="m-sec">${t("Security Gmail")}</label><input class="in" id="m-sec" type="email" dir="ltr" placeholder="guard@gmail.com" autocomplete="off"></div>
+  <button class="btn ghost" data-a="addSec">${I("plus")}${t("Add security")}</button><div style="height:10px"></div>`+(D.secs||[]).map(m=>`<div class="row"><span class="avatar">${I("shield")}</span><div class="t"><b dir="ltr" style="text-align:start">${esc(m.email)}</b><span>${m.signed_up?t("Signed up"):t("Not signed up yet")}</span></div><button class="btn small ghost" data-a="askDelSec" data-v="${esc(m.email)}">${t("Remove")}</button></div>`).join("")}
  return `${topbar(t("Manager panel"),{noBack:true,right:`<button class="iconbtn" data-a="drawer" aria-label="Menu">${I("menu")}</button>`})}<div class="body">
  <div class="grid3" style="margin:4px 0 16px"><div class="stat"><b>${pend.length}</b><span>${t("Pending residents")}</span></div><div class="stat"><b>${D.m.requests.length}</b><span>${t("Open requests")}</span></div><div class="stat"><b>${D.m.complaints.length}</b><span>${t("Open complaints")}</span></div></div>
  <div class="hscroll">${segs("mtab",["Approvals","Requests","Post","Communities","Managers"])}</div><div style="height:14px"></div>${inner}</div>${tabs("manager")}`};
@@ -724,6 +805,12 @@ V.manager=()=>{if(!isMgr())return V.home();
 const DOCK={national_id:"National ID card",contract:"Allocation letter / contract",maintenance_receipt:"Last maintenance fee receipt"};
 const docsOfM=u=>(u?.unit_documents)||[];
 const MGR_ACTIONS={
+ startCam(){startCam()}, stopCam(){stopCam()}, scanNext(){tmp.scanRes=null;render();startCam()},
+ manualCode:el=>busy(el,async()=>{const c=val("sc-man");if(c)await checkCode(c)}),
+ addSec:el=>busy(el,async()=>{const em=val("m-sec").toLowerCase();if(!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(em))return toast(t("Enter a valid Gmail address"));
+   const {error}=await sb.rpc("add_security",{p_email:em});if(error)throw error;await refresh();toast(t("Security added. They see the gate scanner when they sign in with this Gmail."))}),
+ askDelSec(el){sheet(t("Remove from security?"),`<p dir="ltr" style="margin:0 0 6px">${esc(el.dataset.v)}</p><p style="line-height:1.5;margin:0 0 16px">${t("They will lose access to the gate scanner.")}</p><button class="btn" style="background:var(--red);box-shadow:none" data-a="delSec" data-v="${esc(el.dataset.v)}">${t("Remove")}</button><div style="height:10px"></div><button class="btn ghost" data-a="closeSheet">${t("Cancel")}</button>`)},
+ delSec:el=>busy(el,async()=>{const {error}=await sb.rpc("remove_security",{p_email:el.dataset.v});if(error)throw error;closeSheet();await refresh();toast(t("Removed"))}),
  checkStatus:el=>busy(el,async()=>{await load();if(locked()){render();toast(t("Still waiting for approval"))}else home("home")}),
  editRes(el){const u=D.m.units.find(x=>x.id===el.dataset.v);if(!u)return;const have=docsOfM(u);
    const unitField=`<div class="field"><label for="r-un">${t("Unit number (e.g. 1-23-3)")}</label><input class="in" id="r-un" dir="ltr" value="${esc(u.unit_no)}"></div>`;
@@ -758,10 +845,14 @@ function closeSheet(){$("#sheet").classList.remove("on");$("#scrim2").classList.
 let tt;function toast(m){const el=$("#toast");el.textContent=m;el.classList.add("on");clearTimeout(tt);tt=setTimeout(()=>el.classList.remove("on"),2600)}
 function qr(el,text){if(!el)return;el.innerHTML="";try{new QRCode(el,{text,width:168,height:168,colorDark:"#102A43",colorLight:"#ffffff"})}catch(e){el.textContent=text}}
 const OPEN_ROUTES=["welcome","loading","error","profile","community","docs","submitted","gate","profileView"];
-const locked=()=>D.profile&&!isMgr()&&!D.units.some(u=>u.status==="approved");
+const locked=()=>D.profile&&D.profile.role==="resident"&&!D.units.some(u=>u.status==="approved");
 function render(){if(locked()&&!OPEN_ROUTES.includes(route.name)){stack=[];route={name:D.units.length?"gate":"community"}}
+ if(isSec()&&!["scan","profileView","profile","welcome","loading","error"].includes(route.name)){stack=[];route={name:"scan"}}
+ if(route.name!=="scan"&&camStream)stopCam(true);
  $("#screen").innerHTML=(V[route.name]||V.home)();
- if(route.name==="badge"&&unit()?.status==="approved")qr(document.getElementById("qr"),"HUB-BADGE:"+unit().id);
+ if(route.name==="badge"&&unit()?.status==="approved"&&myPhoto(unit()))qr(document.getElementById("qr"),"HUB-BADGE:"+unit().id);
+ if(route.name==="badge"){const ph=myPhoto(unit());const el=document.getElementById("bdph");if(ph&&el)signed(ph.path).then(u=>{if(u)el.src=u})}
+ if(route.name==="scan"&&tmp.scanRes?.photo){const el=document.getElementById("scph");if(el)signed(tmp.scanRes.photo).then(u=>{if(u)el.src=u})}
  const b=document.querySelector("#screen .body");if(b)b.scrollTop=0}
 const err=m=>{const e=document.getElementById("err");if(e)e.textContent=m};
 async function busy(el,fn){if(el?.disabled)return;if(el)el.disabled=true;try{await fn()}catch(e){toast(e.message||t("Something went wrong"))}finally{if(el)el.disabled=false}}
@@ -861,7 +952,7 @@ const A={
 
 Object.assign(A,MGR_ACTIONS);
 document.addEventListener("click",e=>{const el=e.target.closest("[data-a]");if(!el)return;const f=A[el.dataset.a];if(f){e.preventDefault();f(el)}});
-document.addEventListener("change",e=>{if(e.target.id==="f-district"){tmp.district=e.target.value;tmp.comm="";tmp.unit=val("f-unit");render()}if(e.target.id==="f-comm")tmp.comm=e.target.value});
+document.addEventListener("change",e=>{if(e.target.matches("input[type=file][data-doc]"))return uploadDoc(e.target);if(e.target.id==="f-district"){tmp.district=e.target.value;tmp.comm="";tmp.unit=val("f-unit");render()}if(e.target.id==="f-comm")tmp.comm=e.target.value});
 $("#scrim").addEventListener("click",closeDrawer);$("#scrim2").addEventListener("click",closeSheet);
 sb.auth.onAuthStateChange((ev)=>{if(ev==="SIGNED_IN"&&route.name==="welcome")boot()});
 const qs=new URLSearchParams(location.search);if(qs.get("error_description"))setTimeout(()=>toast(qs.get("error_description")),400);
