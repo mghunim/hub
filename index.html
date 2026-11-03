@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="en">
+<html lang="ar" dir="rtl">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
@@ -8,7 +8,9 @@
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="HUB">
 <meta name="description" content="HUB — Your Community. One Place.">
-<title>HUB</title>
+<title>HUB Community Manager</title>
+<meta property="og:title" content="HUB Community Manager">
+<meta property="og:description" content="مجتمعك في مكان واحد — Your Community. One Place.">
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="icon" href="icon.svg" type="image/svg+xml">
 <link rel="apple-touch-icon" href="icon-192.png">
@@ -189,6 +191,27 @@ textarea.in{min-height:110px;resize:vertical;line-height:1.45}
 .hscroll{display:flex;gap:12px;overflow-x:auto;padding-bottom:4px;scrollbar-width:none}
 .example{font-size:10.5px;font-weight:900;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);background:var(--field);padding:2px 7px;border-radius:6px;margin-left:6px;vertical-align:middle}
 .sel-row{display:flex;gap:8px;margin-top:10px;flex-wrap:wrap}
+
+/* language + RTL */
+[lang=ar] body{font-family:var(--ar)}
+.langsw{display:inline-flex;background:var(--field);border-radius:999px;padding:4px;gap:4px}
+.langsw button{padding:8px 16px;border-radius:999px;font-weight:800;font-size:14px;color:var(--muted)}
+.langsw button.on{background:var(--ink);color:var(--bg)}
+.wa{display:flex;align-items:center;gap:12px;background:#E7F7EE;color:#0F6B3A;border:1.5px solid #BFE8D0;border-radius:16px;padding:12px 14px;text-decoration:none;width:100%}
+.wa svg{color:#1E9E57;width:26px;height:26px}
+.wa span{flex:1;min-width:0}.wa b{display:block;font-size:15px}.wa small{font-size:12.5px;font-weight:700;opacity:.85}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .wa{background:#0F2F22;color:#9BE3BD;border-color:#1F5A3E}}
+:root[data-theme="dark"] .wa{background:#0F2F22;color:#9BE3BD;border-color:#1F5A3E}
+[dir=rtl] svg.flip{transform:scaleX(-1)}
+[dir=rtl] .sel svg{right:auto;left:18px}
+[dir=rtl] .sel select{padding-right:20px;padding-left:48px}
+[dir=rtl] .drawer{left:auto;right:0;transform:translateX(102%)}
+[dir=rtl] .drawer.on{transform:none}
+[dir=rtl] .row,[dir=rtl] .qa,[dir=rtl] .mi,[dir=rtl] .me{text-align:right}
+[dir=rtl] .dot{right:auto;left:10px}
+[dir=rtl] .acc ol,[dir=rtl] .acc ul{padding:0 34px 16px 18px}
+[dir=rtl] .field label{padding-left:0;padding-right:4px}
+[dir=rtl] .example{margin-left:0;margin-right:6px}
 @media (prefers-reduced-motion:reduce){*{transition:none!important}}
 </style>
 </head>
@@ -301,24 +324,120 @@ const SB_URL="https://asynjqsxvnlujsyjtlel.supabase.co";
 const SB_KEY="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFzeW5qcXN4dm5sdWpzeWp0bGVsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTM3MDQzNjIsImV4cCI6MjEwOTI4MDM2Mn0.MhuwLmlgbtvJVvc3ujoQE9JwaJCSda8M9s9FxgAIxm0";
 const sb=supabase.createClient(SB_URL,SB_KEY,{auth:{persistSession:true,autoRefreshToken:true,detectSessionInUrl:true,flowType:"pkce"}});
 
+/* ---------- language ---------- */
+const lsGet=k=>{try{return localStorage.getItem(k)}catch(e){return null}};
+const lsSet=(k,v)=>{try{localStorage.setItem(k,v)}catch(e){}};
+let LANG=lsGet("hub-lang")||"ar";
+const AR={
+"Your Community. One Place.":"مجتمعك في مكان واحد",
+"Gate passes, requests, services and news from your compound, all in one hub.":"تصاريح البوابة والطلبات والخدمات وأخبار الكمبوند في تطبيق واحد.",
+"Continue with Google":"الدخول بحساب جوجل","Life Happens Here.":"الحياة هنا.",
+"By continuing you agree to our":"بالمتابعة أنت توافق على","Privacy Policy":"سياسة الخصوصية",
+"Loading…":"جاري التحميل…","Couldn't load your data":"تعذر تحميل بياناتك","Try again":"حاول مرة أخرى","Sign out":"تسجيل الخروج",
+"Edit profile":"تعديل الملف الشخصي","Complete your profile":"أكمل بياناتك","You are signed in as the app manager.":"أنت مسجل كمدير للتطبيق.",
+"Tell us who you are so the management can verify you.":"عرّفنا بنفسك عشان الإدارة تقدر تتحقق منك.",
+"Full name":"الاسم بالكامل","Google account":"حساب جوجل","Mobile number":"رقم الموبايل","You are the unit's":"صفتك في الوحدة",
+"Owner":"مالك","Tenant":"مستأجر","Family":"فرد من الأسرة","National ID (last 4 digits)":"الرقم القومي (آخر ٤ أرقام)",
+"Save":"حفظ","Next":"التالي","Add a new unit":"إضافة وحدة جديدة","Add a new community":"إضافة كمبوند جديد",
+"No communities are open for registration yet.":"لا توجد كمبوندات متاحة للتسجيل حاليًا.","The management will add yours soon.":"الإدارة هتضيف الكمبوند بتاعك قريب.",
+"Check again":"تحقق مرة أخرى","Enter your community":"أدخل بيانات الكمبوند","and unit info.":"والوحدة.",
+"District":"المنطقة","Community":"الكمبوند","Unit number (e.g. 1-23-3)":"رقم الوحدة (مثال 1-23-3)","Unit type":"نوع الوحدة",
+"Apartment":"شقة","Villa":"فيلا","Commercial":"تجاري","Submit":"إرسال","Request sent":"تم إرسال الطلب",
+"{c} management will review {u} and approve your account. You can start using the app meanwhile.":"إدارة {c} هتراجع {u} وتوافق على حسابك. تقدر تستخدم التطبيق لحد ما يتم ده.",
+"Go to home":"الذهاب للرئيسية","Hi, {n}":"أهلاً، {n}","Unit {u}":"وحدة {u}","No unit yet":"لا توجد وحدة","ID Badge":"كارت الهوية",
+"Your unit is waiting for management approval. Gate pass and ID badge unlock once approved.":"وحدتك في انتظار موافقة الإدارة. تصاريح البوابة وكارت الهوية هيتفعلوا بعد الموافقة.",
+"The management could not verify this unit. Please contact the office.":"الإدارة لم تتمكن من التحقق من الوحدة. برجاء التواصل مع المكتب.",
+"Complaints":"الشكاوى","Gate Pass":"تصاريح البوابة","Requests":"الطلبات","Community Updates":"أخبار الكمبوند","View All ›":"عرض الكل ›",
+"No updates yet. News from your management will show here.":"لا توجد أخبار حاليًا. إعلانات الإدارة هتظهر هنا.","No updates yet.":"لا توجد أخبار حاليًا.",
+"Booked for {w}":"محجوز يوم {w}","Unit":"وحدة","New":"جديد","Open":"مفتوح","History":"السابق","Services":"الخدمات",
+"Nothing open right now.":"لا يوجد شيء مفتوح حاليًا.","No closed items yet.":"لا توجد طلبات منتهية.","Discover":"اكتشف","Categories":"الأقسام",
+"Short numbers":"أرقام مهمة","Community guidelines":"لائحة الكمبوند","Help Center":"مركز المساعدة","My properties":"وحداتي",
+"Identity Badge":"كارت الهوية","Your badge activates after the management approves {u}.":"الكارت هيتفعل بعد موافقة الإدارة على {u}.",
+"Resident":"ساكن","Badge no.":"رقم الكارت","Status":"الحالة","Active":"مفعّل","Show this QR code to security at the gate.":"اعرض الكود ده على الأمن عند البوابة.",
+"Create new gate pass":"إنشاء تصريح جديد","No gate passes yet. Create one to invite a guest.":"لا توجد تصاريح. اعمل تصريح لضيفك.","Car":"سيارة",
+"Gate Notification":"إبلاغ البوابة","Tell security about a delivery, taxi or limousine so they let it in without calling you.":"بلّغ الأمن بالدليفري أو التاكسي أو الليموزين عشان يدخل من غير ما يتصلوا بيك.",
+"Type":"النوع","Delivery":"دليفري","Taxi / Limo":"تاكسي / ليموزين","Maintenance":"صيانة","Company or driver name":"اسم الشركة أو السائق",
+"Plate number (optional)":"رقم اللوحة (اختياري)","Notify gate":"إبلاغ البوابة","Recent":"الأحدث","No plate":"بدون لوحة","No notifications sent yet.":"لم يتم إرسال أي إبلاغ بعد.",
+"New complaint":"شكوى جديدة","No complaints. That's a good sign.":"لا توجد شكاوى. ده شيء كويس.","Violations":"المخالفات","Fine EGP {f}":"غرامة {f} جنيه",
+"No violations on your units.":"لا توجد مخالفات على وحداتك.","Notifications":"الإشعارات","You're all caught up.":"لا توجد إشعارات جديدة.",
+"Phone Directory":"دليل الأرقام","{c} Call Center":"خدمة عملاء {c}","Tap to call":"اضغط للاتصال","Not added yet":"لم تتم الإضافة بعد",
+"Security gate":"أمن البوابة","Management office":"مكتب الإدارة","The management hasn't added numbers yet.":"الإدارة لم تضف الأرقام بعد.",
+"The management hasn't published guidelines yet.":"الإدارة لم تنشر اللائحة بعد.","Contact us":"تواصل معنا","Frequently asked questions":"الأسئلة الشائعة",
+"Quick answers on how to use the app.":"إجابات سريعة عن استخدام التطبيق.","Manage properties":"إدارة الوحدات","No units yet.":"لا توجد وحدات.",
+"My account":"حسابي","Mobile":"الموبايل","Relation to unit":"الصفة في الوحدة","Delete my account":"حذف حسابي","App manager":"مدير التطبيق",
+"Manager panel":"لوحة الإدارة","Manager":"الإدارة","Home":"الرئيسية","Approvals":"الموافقات","Post":"نشر","Communities":"الكمبوندات",
+"Pending residents":"سكان في الانتظار","Open requests":"طلبات مفتوحة","Open complaints":"شكاوى مفتوحة","Approve":"موافقة","Reject":"رفض",
+"No residents waiting for approval.":"لا يوجد سكان في انتظار الموافقة.","Approved residents ({n})":"السكان المعتمدين ({n})",
+"Complaint":"شكوى","Mark in progress":"جاري التنفيذ","Close":"إغلاق","No open requests or complaints.":"لا توجد طلبات أو شكاوى مفتوحة.",
+"Add a community first.":"أضف كمبوند الأول.","Choose community":"اختار الكمبوند","Announcement":"الإعلان","e.g. The pool opens Friday at 9 am.":"مثال: حمام السباحة هيفتح يوم الجمعة الساعة ٩ الصبح.",
+"Publish update":"نشر الإعلان","Issue a violation":"تسجيل مخالفة","Choose unit":"اختار الوحدة","Reason":"السبب","e.g. Parking in fire lane":"مثال: ركن في ممر الطوارئ",
+"Fine (EGP, optional)":"الغرامة بالجنيه (اختياري)","Issue violation":"تسجيل المخالفة","Violations can be issued once residents are approved.":"تقدر تسجل مخالفات بعد اعتماد السكان.",
+"Recent updates":"آخر الإعلانات","Nothing published yet.":"لم يتم نشر شيء بعد.","Add community":"إضافة كمبوند","{n} approved units":"{n} وحدة معتمدة",
+"No communities yet. Residents can register once you add one.":"لا توجد كمبوندات. السكان يقدروا يسجلوا بعد ما تضيف كمبوند.",
+"ID Badge ":"كارت الهوية","Community Info":"معلومات الكمبوند","Language":"اللغة","Switch unit":"تغيير الوحدة","Switched unit":"تم تغيير الوحدة",
+"Preferred date":"التاريخ المفضل","Time slot":"الموعد","Morning":"الصبح","Afternoon":"الضهر","Evening":"بالليل","Details":"التفاصيل",
+"Describe what you need":"اكتب اللي محتاجه","Book service":"احجز الخدمة","Submit request":"إرسال الطلب","Service booked":"تم حجز الخدمة","Request submitted":"تم إرسال الطلب",
+"Available after your unit is approved":"متاح بعد موافقة الإدارة على وحدتك","Guest name":"اسم الضيف","Guest full name":"اسم الضيف بالكامل","Visit date":"تاريخ الزيارة",
+"Valid for":"صالح لمدة","One visit":"زيارة واحدة","Full day":"يوم كامل","One week":"أسبوع","Car plate (optional)":"لوحة السيارة (اختياري)","Generate pass":"إنشاء التصريح",
+"Enter the guest's name.":"اكتب اسم الضيف.","Guest":"الضيف","Date":"التاريخ","Host unit":"الوحدة","Valid":"الصلاحية",
+"Take a screenshot and send it to your guest. Security scans the code at the gate.":"خد سكرين شوت وابعتها لضيفك. الأمن هيعمل سكان للكود عند البوابة.",
+"Enter the company or driver name":"اكتب اسم الشركة أو السائق","Gate notified":"تم إبلاغ البوابة","Category":"التصنيف","Choose a category":"اختار التصنيف",
+"What happened?":"إيه اللي حصل؟","Describe the issue, place and time":"اكتب المشكلة والمكان والوقت","Submit complaint":"إرسال الشكوى",
+"Choose a category and describe the issue.":"اختار التصنيف واكتب المشكلة.","Complaint submitted":"تم إرسال الشكوى",
+"Delete your account?":"حذف حسابك؟","This permanently removes your profile, units, passes, requests and complaints. You will need to sign in and register again.":"هيتم حذف ملفك ووحداتك وتصاريحك وطلباتك وشكاويك نهائيًا، وهتحتاج تسجل من جديد.",
+"Keep my account":"الاحتفاظ بحسابي","Resident approved":"تمت الموافقة على الساكن","Request rejected":"تم الرفض","Marked {s}":"تم التحديث: {s}",
+"Choose the community":"اختار الكمبوند","Write the announcement first":"اكتب الإعلان الأول","Update published":"تم نشر الإعلان","Update deleted":"تم حذف الإعلان",
+"Choose the unit and enter a reason":"اختار الوحدة واكتب السبب","Fine must be a number":"الغرامة لازم تكون رقم","Violation issued":"تم تسجيل المخالفة",
+"Edit community":"تعديل الكمبوند","e.g. North Coast":"مثال: الساحل الشمالي","Community name":"اسم الكمبوند","e.g. Marina Bay Village":"مثال: مارينا باي",
+"Call center":"خدمة العملاء","WhatsApp customer service":"واتساب خدمة العملاء","With country code, e.g. 201012345678":"بكود الدولة، مثال 201012345678",
+"Community guidelines ":"لائحة الكمبوند","Rules residents should follow":"القواعد اللي السكان لازم يلتزموا بيها","Save changes":"حفظ التعديلات","Delete community":"حذف الكمبوند",
+"Enter the district and community name.":"اكتب المنطقة واسم الكمبوند.","Community saved":"تم حفظ الكمبوند","Community added":"تمت إضافة الكمبوند",
+"Delete community?":"حذف الكمبوند؟","This also removes every unit, request, complaint, pass and update linked to it. This can't be undone.":"ده هيحذف كمان كل الوحدات والطلبات والشكاوى والتصاريح والإعلانات المرتبطة بيه. مينفعش التراجع.",
+"Cancel":"إلغاء","Community deleted":"تم حذف الكمبوند","Enter your full name.":"اكتب اسمك بالكامل.","Enter an Egyptian mobile number, e.g. 01012345678.":"اكتب رقم موبايل مصري، مثال 01012345678.",
+"Enter exactly 4 digits for the national ID.":"اكتب ٤ أرقام بالظبط.","Profile saved":"تم حفظ البيانات","Choose your district.":"اختار المنطقة.","Choose your community.":"اختار الكمبوند.",
+"Enter your unit number.":"اكتب رقم الوحدة.","This unit is already on your account.":"الوحدة دي موجودة على حسابك بالفعل.","Unit submitted for approval":"تم إرسال الوحدة للموافقة",
+"Add your unit first to use this.":"أضف وحدتك الأول عشان تستخدم ده.","Add a unit":"إضافة وحدة","Something went wrong":"حصلت مشكلة",
+"Chat with customer service":"كلّم خدمة العملاء","on WhatsApp":"على واتساب","WhatsApp":"واتساب","Pending":"في الانتظار","Approved":"معتمد","Rejected":"مرفوض",
+"In progress":"جاري التنفيذ","Closed":"مغلق","Unpaid":"غير مدفوعة","Paid":"مدفوعة","Today":"اليوم","Yesterday":"أمس","{n} days ago":"منذ {n} يوم",
+"Security":"الأمن","Cleanliness":"النظافة","Landscaping":"الزراعة والحدائق","Noise":"الإزعاج","Parking":"الجراجات والركن","Facilities":"المرافق","Other":"أخرى",
+"Hello, I'm {n} from {c} · Unit {u}.":"السلام عليكم، أنا {n} من {c} · وحدة {u}.","Contact management on WhatsApp":"تواصل مع الإدارة على واتساب",
+"Choose your language":"اختار اللغة","Request":"طلب","Requested {d}":"بتاريخ {d}",
+};
+const t=(s,v={})=>{let r=(LANG==="ar"&&AR[s])||s;for(const k in v)r=r.replace("{"+k+"}",v[k]);return r};
+function applyLang(){document.documentElement.lang=LANG;document.documentElement.dir=LANG==="ar"?"rtl":"ltr"}
+applyLang();
+const FAQ_AR=[
+ ["إزاي أقدم طلب",["افتح القائمة الجانبية","اختار «الطلبات»","اختار نوع الطلب","اكتب التفاصيل واضغط إرسال"]],
+ ["إزاي أحجز خدمة",["اضغط «الخدمات» في الشريط اللي تحت","اختار الخدمة","حدد اليوم والموعد","أكّد الحجز"]],
+ ["إزاي أعمل تصريح لضيف",["افتح القائمة الجانبية","اختار «تصاريح البوابة»","اضغط «إنشاء تصريح جديد»","ابعت الـ QR لضيفك"]],
+ ["إزاي أبلّغ البوابة بدليفري",["افتح القائمة الجانبية","اختار «إبلاغ البوابة»","اكتب اسم الشركة أو السائق","اضغط «إبلاغ البوابة»"]],
+ ["إزاي أستخدم كارت الهوية",["افتح القائمة الجانبية","اختار «كارت الهوية»","اعرض الكود على الأمن عند البوابة"]],
+ ["إزاي أقدم شكوى",["افتح القائمة الجانبية","اختار «الشكاوى»","اختار التصنيف","اكتب المشكلة واضغط إرسال"]],
+ ["إزاي أضيف وحدة أو كمبوند تاني",["افتح القائمة الجانبية","اختار «إدارة الوحدات»","اضغط «إضافة وحدة جديدة»","اختار المنطقة والكمبوند واكتب رقم الوحدة"]],
+ ["إزاي أغير اللغة",["افتح القائمة الجانبية","اضغط «اللغة»","اختار العربية أو English"]],
+];
+const faq=()=>LANG==="ar"?FAQ_AR:[...FAQ,["Change the language",["Open the side menu","Tap “Language”","Choose العربية or English"]]];
+const typeName=x=>LANG==="ar"?x.ar:x.en;
+
 /* ---------- helpers ---------- */
 const esc=s=>String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
 const today=()=>new Date().toISOString().slice(0,10);
-const ago=d=>{const n=Math.floor((Date.now()-new Date(d))/864e5);return n<=0?"Today":n===1?"Yesterday":n+" days ago"};
-const fmtDate=d=>new Date(d).toLocaleDateString("en-GB",{day:"numeric",month:"short",year:"numeric"});
+const ago=d=>{const n=Math.floor((Date.now()-new Date(d))/864e5);return n<=0?t("Today"):n===1?t("Yesterday"):t("{n} days ago",{n})};
+const fmtDate=d=>new Date(d).toLocaleDateString(LANG==="ar"?"ar-EG":"en-GB",{day:"numeric",month:"short",year:"numeric"});
 const initials=n=>(n||"?").trim().split(/\s+/).map(w=>w[0]).slice(0,2).join("").toUpperCase();
 const $=s=>document.querySelector(s);
 const val=id=>(document.getElementById(id)?.value||"").trim();
-const lsGet=k=>{try{return localStorage.getItem(k)}catch(e){return null}};
-const lsSet=(k,v)=>{try{localStorage.setItem(k,v)}catch(e){}};
 const q=async p=>{const r=await p;if(r.error)throw r.error;return r.data};
+const waNum=s=>{let d=String(s||"").replace(/\D/g,"");if(d.startsWith("00"))d=d.slice(2);if(/^0\d{10}$/.test(d))d="20"+d.slice(1);return d};
+const waLink=c=>{const u=unit();const msg=t("Hello, I'm {n} from {c} · Unit {u}.",{n:D.profile?.full_name||"",c:c?.name||"",u:u?.unit_no||""});return `https://wa.me/${waNum(c.whatsapp)}?text=${encodeURIComponent(msg)}`};
+const WA='<svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 20l1.3-3.9A8 8 0 1 1 8 19z"/><path d="M9 8.5c0 3.3 3 6.5 6.5 6.5l1-1.5-2-1-1 .8a4.6 4.6 0 0 1-2.3-2.3l.8-1-1-2z" fill="currentColor" stroke="none"/></svg>';
 
 /* ---------- state ---------- */
 const D={session:null,profile:null,communities:[],units:[],updates:[],requests:[],complaints:[],passes:[],notes:[],violations:[],notifs:[],m:{units:[],requests:[],complaints:[]}};
 const isMgr=()=>D.profile?.role==="manager";
 const unit=()=>D.units.find(u=>u.id===lsGet("hub-active"))||D.units.find(u=>u.status!=="rejected")||D.units[0];
 const comm=()=>{const u=unit();return u?D.communities.find(c=>c.id===u.community_id):null};
-const unitLabel=u=>u?`Unit ${u.unit_no}`:"No unit yet";
+const unitLabel=u=>u?t("Unit {u}",{u:u.unit_no}):t("No unit yet");
 const districts=()=>[...new Set(D.communities.map(c=>c.district))].sort();
 
 async function load(){
@@ -336,6 +455,7 @@ async function load(){
     q(sb.from("notifications").select("*").eq("user_id",id).order("created_at",{ascending:false}).limit(60)),
   ]);
   Object.assign(D,{profile,communities,units,updates,requests,complaints,passes,notes,notifs,violations:violations.filter(v=>v.units?.user_id===id)});
+  if(profile.lang&&!lsGet("hub-lang")&&profile.lang!==LANG){LANG=profile.lang;applyLang()}
   if(isMgr())await loadMgr();
 }
 async function loadMgr(){
@@ -366,211 +486,226 @@ async function boot(){
 async function refresh(){try{await load();render()}catch(e){toast(e.message)}}
 
 /* ---------- shell ---------- */
-const topbar=(title,o={})=>`<header class="top">${o.noBack?"<span></span>":`<button class="iconbtn" data-a="back" aria-label="Back">${I("left")}</button>`}<h1>${title}</h1>${o.right||"<span></span>"}</header>`;
-function tabs(on){const t=[["home","Home","home"],["services","Services","grid"],["discover","Discover","compass"]];if(isMgr())t.push(["manager","Manager","settings"]);
-  return `<nav class="tabs">${t.map(([k,l,ic])=>`<button class="tab ${on===k?"on":""}" data-a="tab" data-v="${k}">${I(ic)}<span>${l}</span></button>`).join("")}</nav>`}
+const topbar=(title,o={})=>`<header class="top">${o.noBack?"<span></span>":`<button class="iconbtn" data-a="back" aria-label="Back">${I("left","flip")}</button>`}<h1>${title}</h1>${o.right||"<span></span>"}</header>`;
+function tabs(on){const tb=[["home","Home","home"],["services","Services","grid"],["discover","Discover","compass"]];if(isMgr())tb.push(["manager","Manager","settings"]);
+  return `<nav class="tabs">${tb.map(([k,l,ic])=>`<button class="tab ${on===k?"on":""}" data-a="tab" data-v="${k}">${I(ic)}<span>${t(l)}</span></button>`).join("")}</nav>`}
 const PILL={Open:"p-open",pending:"p-open","In progress":"p-prog",approved:"p-ok",Active:"p-ok",Paid:"p-ok",rejected:"p-bad",Unpaid:"p-bad"};
 const LBL={pending:"Pending",approved:"Approved",rejected:"Rejected"};
-const pill=s=>`<span class="pill ${PILL[s]||"p-closed"}">${esc(LBL[s]||s)}</span>`;
+const pill=s=>`<span class="pill ${PILL[s]||"p-closed"}">${esc(t(LBL[s]||s))}</span>`;
 const selHTML=(id,ph,opts,v="")=>`<div class="sel"><select id="${id}" required><option value="" disabled ${v?"":"selected"} hidden>${esc(ph)}</option>${opts.map(o=>{const [ov,ol]=Array.isArray(o)?o:[o,o];return `<option value="${esc(ov)}" ${ov===v?"selected":""}>${esc(ol)}</option>`}).join("")}</select>${I("down")}</div>`;
-const segs=(k,list)=>`<div class="seg">${list.map(x=>`<button class="${(tmp[k]||list[0])===x?"on":""}" data-a="seg" data-k="${k}" data-v="${x}">${x}</button>`).join("")}</div>`;
+const segs=(k,list)=>`<div class="seg">${list.map(x=>`<button class="${(tmp[k]||list[0])===x?"on":""}" data-a="seg" data-k="${k}" data-v="${x}">${t(x)}</button>`).join("")}</div>`;
 const unitChip=()=>`<div class="unitchip"><span class="unitline">${I("home")}${esc(unitLabel(unit()))}</span></div>`;
-const empty=(ic,t)=>`<div class="empty">${I(ic)}${t}</div>`;
-const needUnit=()=>`<div class="empty">${I("building")}Add your unit first to use this.<div style="height:14px"></div><button class="btn small" data-a="addUnit">${I("plus")}Add a unit</button></div>`;
+const empty=(ic,txt)=>`<div class="empty">${I(ic)}${txt}</div>`;
+const needUnit=()=>`<div class="empty">${I("building")}${t("Add your unit first to use this.")}<div style="height:14px"></div><button class="btn small" data-a="addUnit">${I("plus")}${t("Add a unit")}</button></div>`;
+const langSwitch=()=>`<div class="langsw"><button class="${LANG==="ar"?"on":""}" data-a="setLang" data-v="ar">العربية</button><button class="${LANG==="en"?"on":""}" data-a="setLang" data-v="en">English</button></div>`;
+const waCard=c=>c?.whatsapp?`<a class="wa" href="${waLink(c)}" target="_blank" rel="noopener">${WA}<span><b>${t("Chat with customer service")}</b><small>${t("on WhatsApp")} · <bdi>+${esc(waNum(c.whatsapp))}</bdi></small></span>${I("right","flip")}</a>`:"";
 
 /* ---------- screens ---------- */
 const V={};
-V.loading=()=>`<div class="welcome">${hubMark()}<p class="sub" style="margin-top:14px">Loading…</p></div>`;
-V.error=()=>`<div class="welcome">${hubMark()}<h1 style="font-size:22px">Couldn't load your data</h1><p>${esc(route.msg)}</p></div><div class="foot"><button class="btn" data-a="boot">Try again</button><div style="height:10px"></div><button class="btn ghost" data-a="logout">Sign out</button></div>`;
+V.loading=()=>`<div class="welcome">${hubMark()}<p class="sub" style="margin-top:14px">${t("Loading…")}</p></div>`;
+V.error=()=>`<div class="welcome">${hubMark()}<h1 style="font-size:22px">${t("Couldn't load your data")}</h1><p>${esc(route.msg)}</p></div><div class="foot"><button class="btn" data-a="boot">${t("Try again")}</button><div style="height:10px"></div><button class="btn ghost" data-a="logout">${t("Sign out")}</button></div>`;
 V.welcome=()=>`
+ <div style="display:flex;justify-content:center;padding:14px 16px 0">${langSwitch()}</div>
  <div class="welcome">${hubMark()}
   <h1 class="word" style="font-size:40px;margin-top:10px">HUB</h1>
-  <p style="font-size:17px;color:var(--ink);font-weight:800">Your Community. One Place.</p>
-  <p>Gate passes, requests, services and news from your compound, all in one hub.</p>
+  <p style="font-size:17px;color:var(--ink);font-weight:800">${t("Your Community. One Place.")}</p>
+  <p>${t("Gate passes, requests, services and news from your compound, all in one hub.")}</p>
  </div>
  <div class="foot" style="display:flex;flex-direction:column;gap:12px">
-  <button class="gbtn" data-a="google">${G}<span>Continue with Google</span></button>
-  <p class="note" style="margin-top:0;color:var(--teal);font-weight:800;letter-spacing:.04em">Life Happens Here.</p>
-  <p class="note" style="margin-top:0">By continuing you agree to our <a href="privacy.html" style="color:var(--teal);font-weight:800">Privacy Policy</a>.</p>
+  <button class="gbtn" data-a="google">${G}<span>${t("Continue with Google")}</span></button>
+  <p class="note" style="margin-top:0;color:var(--teal);font-weight:800;letter-spacing:.04em">${t("Life Happens Here.")}</p>
+  <p class="note" style="margin-top:0">${t("By continuing you agree to our")} <a href="privacy.html" style="color:var(--teal);font-weight:800">${t("Privacy Policy")}</a>.</p>
  </div>`;
 
 V.profile=()=>{const p=D.profile;const mgr=isMgr();return `
- ${topbar(route.editing?"Edit profile":"Complete your profile",{noBack:!route.editing})}
+ ${topbar(route.editing?t("Edit profile"):t("Complete your profile"),{noBack:!route.editing,right:route.editing?"<span></span>":""})}
  <div class="body">
+  ${route.editing?"":`<div style="display:flex;justify-content:center;margin-bottom:12px">${langSwitch()}</div>`}
   ${route.editing||mgr?"":'<div class="steps"><i class="on"></i><i></i><i></i></div>'}
-  <p class="lead">${mgr?"You are signed in as the app manager.":"Tell us who you are so the management can verify you."}</p>
-  <div class="field"><label for="f-name">Full name</label><input class="in" id="f-name" value="${esc(tmp._fname??p.full_name??"")}" placeholder="Full name" autocomplete="name"></div>
-  <div class="field"><label for="f-email">Google account</label><input class="in" id="f-email" value="${esc(p.email)}" disabled></div>
-  <div class="field"><label for="f-phone">Mobile number</label><input class="in" id="f-phone" inputmode="tel" value="${esc(tmp._fphone??p.phone??"")}" placeholder="01x xxxx xxxx" autocomplete="tel"></div>
-  ${mgr?"":`<div class="field"><label>You are the unit's</label>${segs("rel",["Owner","Tenant","Family"])}</div>
-  <div class="field"><label for="f-nid">National ID (last 4 digits)</label><input class="in" id="f-nid" inputmode="numeric" maxlength="4" value="${esc(tmp._fnid??p.nid_last4??"")}" placeholder="••••"></div>`}
+  <p class="lead">${mgr?t("You are signed in as the app manager."):t("Tell us who you are so the management can verify you.")}</p>
+  <div class="field"><label for="f-name">${t("Full name")}</label><input class="in" id="f-name" value="${esc(p.full_name??"")}" placeholder="${t("Full name")}" autocomplete="name"></div>
+  <div class="field"><label for="f-email">${t("Google account")}</label><input class="in" id="f-email" dir="ltr" value="${esc(p.email)}" disabled></div>
+  <div class="field"><label for="f-phone">${t("Mobile number")}</label><input class="in" id="f-phone" dir="ltr" inputmode="tel" value="${esc(p.phone??"")}" placeholder="01x xxxx xxxx" autocomplete="tel"></div>
+  ${mgr?"":`<div class="field"><label>${t("You are the unit's")}</label>${segs("rel",["Owner","Tenant","Family"])}</div>
+  <div class="field"><label for="f-nid">${t("National ID (last 4 digits)")}</label><input class="in" id="f-nid" dir="ltr" inputmode="numeric" maxlength="4" value="${esc(p.nid_last4??"")}" placeholder="••••"></div>`}
   <div class="err" id="err"></div>
  </div>
- <div class="foot"><button class="btn" data-a="saveProfile">${route.editing?"Save":"Next"}</button></div>`};
+ <div class="foot"><button class="btn" data-a="saveProfile">${route.editing?t("Save"):t("Next")}</button></div>`};
 
 V.community=()=>{const d=tmp.district||"";const list=D.communities.filter(c=>c.district===d);const adding=route.adding||D.units.length;
- if(!D.communities.length)return `${topbar("Add a new community",{noBack:!adding})}<div class="body">${empty("building","No communities are open for registration yet.<br>The management will add yours soon.")}</div><div class="foot"><button class="btn ghost" data-a="boot">Check again</button></div>`;
+ if(!D.communities.length)return `${topbar(t("Add a new community"),{noBack:!adding})}<div class="body">${empty("building",t("No communities are open for registration yet.")+"<br>"+t("The management will add yours soon."))}</div><div class="foot"><button class="btn ghost" data-a="boot">${t("Check again")}</button></div>`;
  return `
- ${topbar(adding?"Add a new unit":"Add a new community",{noBack:!adding})}
+ ${topbar(adding?t("Add a new unit"):t("Add a new community"),{noBack:!adding})}
  <div class="body">
   ${adding?"":'<div class="steps"><i class="on"></i><i class="on"></i><i></i></div>'}
-  <p class="lead">Enter your community<br>and unit info.</p>
-  <div class="field">${selHTML("f-district","District",districts(),d)}</div>
-  <div class="field">${selHTML("f-comm","Community",list.map(c=>[c.id,c.name]),tmp.comm||"")}</div>
-  <div class="field"><input class="in" id="f-unit" placeholder="Unit number (e.g. 1-23-3)" value="${esc(tmp.unit||"")}"></div>
-  <div class="field"><label>Unit type</label>${segs("utype",["Apartment","Villa","Commercial"])}</div>
+  <p class="lead">${t("Enter your community")}<br>${t("and unit info.")}</p>
+  <div class="field">${selHTML("f-district",t("District"),districts(),d)}</div>
+  <div class="field">${selHTML("f-comm",t("Community"),list.map(c=>[c.id,c.name]),tmp.comm||"")}</div>
+  <div class="field"><input class="in" id="f-unit" dir="ltr" placeholder="${t("Unit number (e.g. 1-23-3)")}" value="${esc(tmp.unit||"")}"></div>
+  <div class="field"><label>${t("Unit type")}</label>${segs("utype",["Apartment","Villa","Commercial"])}</div>
   <div class="err" id="err"></div>
  </div>
- <div class="foot"><button class="btn" data-a="saveUnit">Submit</button></div>`};
+ <div class="foot"><button class="btn" data-a="saveUnit">${t("Submit")}</button></div>`};
 
-V.submitted=()=>{const u=unit();return `
+V.submitted=()=>{const u=unit();const c=comm();return `
  <div class="welcome"><div class="mark" style="background:var(--teal-soft)">${I("check")}</div>
-  <h1 style="font-size:24px">Request sent</h1>
-  <p>${esc(u?.communities?.name)} management will review <b>${esc(unitLabel(u))}</b> and approve your account. You can start using the app meanwhile.</p></div>
- <div class="foot"><div class="steps" style="margin-bottom:16px"><i class="on"></i><i class="on"></i><i class="on"></i></div><button class="btn" data-a="tab" data-v="home">Go to home</button></div>`};
+  <h1 style="font-size:24px">${t("Request sent")}</h1>
+  <p>${t("{c} management will review {u} and approve your account. You can start using the app meanwhile.",{c:esc(u?.communities?.name),u:"<b>"+esc(unitLabel(u))+"</b>"})}</p>
+  ${c?.whatsapp?`<div style="width:100%;margin-top:10px">${waCard(c)}</div>`:""}</div>
+ <div class="foot"><div class="steps" style="margin-bottom:16px"><i class="on"></i><i class="on"></i><i class="on"></i></div><button class="btn" data-a="tab" data-v="home">${t("Go to home")}</button></div>`};
 
 const myUpdates=()=>{const c=comm();return c?D.updates.filter(x=>x.community_id===c.id):[]};
-const postHTML=p=>`<article class="post"><div class="who"><span class="avatar">${initials(p.author)}</span><div><b style="font-size:14.5px">${esc(p.author)}</b><div class="sub" style="font-size:12px">${ago(p.created_at)}</div></div></div><p dir="auto">${esc(p.body)}</p></article>`;
+const postHTML=p=>`<article class="post"><div class="who"><span class="avatar">${initials(p.author)}</span><div><b style="font-size:14.5px">${esc(p.author==="Management office"?t("Management office"):p.author)}</b><div class="sub" style="font-size:12px">${ago(p.created_at)}</div></div></div><p dir="auto">${esc(p.body)}</p></article>`;
 V.home=()=>{const u=unit();const c=comm();const unread=D.notifs.some(n=>!n.read);const first=(D.profile.full_name||"").split(" ")[0];
- const head=`<header class="top"><button class="iconbtn" data-a="drawer" aria-label="Open menu">${I("menu")}</button>
+ const head=`<header class="top"><button class="iconbtn" data-a="drawer" aria-label="Menu">${I("menu")}</button>
   <button data-a="switchUnit" style="display:flex;align-items:center;justify-content:center;gap:4px;font-weight:800;font-size:17px;min-width:0">${esc(c?.name||"HUB")}${I("down")}</button>
-  <button class="iconbtn" data-a="go" data-v="notifs" aria-label="Notifications">${I("bell")}${unread?'<span class="dot"></span>':""}</button></header>`;
- if(!u)return `${head}<div class="body"><p class="h-hi">Hi, ${esc(first)}</p>${needUnit()}</div>${tabs("home")}`;
+  <button class="iconbtn" data-a="go" data-v="notifs" aria-label="${t("Notifications")}">${I("bell")}${unread?'<span class="dot"></span>':""}</button></header>`;
+ if(!u)return `${head}<div class="body"><p class="h-hi">${t("Hi, {n}",{n:esc(first)})}</p>${needUnit()}</div>${tabs("home")}`;
  const ups=myUpdates();
  return `${head}
  <div class="body">
   <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:10px">
-   <div style="min-width:0"><p class="h-hi">Hi, ${esc(first)}</p><span class="unitline">${I("home")}${esc(unitLabel(u))}</span></div>
-   <button data-a="go" data-v="badge" style="display:flex;flex-direction:column;align-items:center;gap:2px;font-size:12px;font-weight:700;color:var(--muted)">${I("badge")}ID Badge</button>
+   <div style="min-width:0"><p class="h-hi">${t("Hi, {n}",{n:esc(first)})}</p><span class="unitline">${I("home")}${esc(unitLabel(u))}</span></div>
+   <button data-a="go" data-v="badge" style="display:flex;flex-direction:column;align-items:center;gap:2px;font-size:12px;font-weight:700;color:var(--muted)">${I("badge")}${t("ID Badge")}</button>
   </div>
-  ${u.status==="pending"?`<div class="banner">${I("alert")}<span>Your unit is waiting for management approval. Gate pass and ID badge unlock once approved.</span></div>`:""}
-  ${u.status==="rejected"?`<div class="banner">${I("alert")}<span>The management could not verify this unit. Please contact the office.</span></div>`:""}
-  <div class="hero">${hubMark("sm")}<div style="min-width:0"><b style="font-size:18px">${esc(c?.name)}</b><div class="sub">${esc(c?.district)} · ${esc(u.unit_type)}</div></div></div>
+  ${u.status==="pending"?`<div class="banner">${I("alert")}<span>${t("Your unit is waiting for management approval. Gate pass and ID badge unlock once approved.")}</span></div>`:""}
+  ${u.status==="rejected"?`<div class="banner">${I("alert")}<span>${t("The management could not verify this unit. Please contact the office.")}</span></div>`:""}
+  <div class="hero">${hubMark("sm")}<div style="min-width:0"><b style="font-size:18px">${esc(c?.name)}</b><div class="sub">${esc(c?.district)} · ${t(u.unit_type)}</div></div></div>
   <div class="grid3" style="margin-top:14px">
-   ${[["complaints","Complaints","chat","var(--teal)"],["gatepass","Gate Pass","ticket","var(--coral)"],["requests","Requests","clip","var(--amber)"]].map(([k,l,ic,col])=>`<button class="qa" data-a="go" data-v="${k}"><span class="ic" style="background:color-mix(in srgb,${col} 18%,transparent);color:${col}">${I(ic)}</span>${l}</button>`).join("")}
+   ${[["complaints","Complaints","chat","var(--teal)"],["gatepass","Gate Pass","ticket","var(--coral)"],["requests","Requests","clip","var(--amber)"]].map(([k,l,ic,col])=>`<button class="qa" data-a="go" data-v="${k}"><span class="ic" style="background:color-mix(in srgb,${col} 18%,transparent);color:${col}">${I(ic)}</span>${t(l)}</button>`).join("")}
   </div>
-  <div class="sec"><h2>Community Updates</h2>${ups.length>3?`<button class="link" data-a="go" data-v="updates">View All ›</button>`:""}</div>
-  ${ups.slice(0,3).map(postHTML).join("")||empty("megaphone","No updates yet. News from your management will show here.")}
+  ${c?.whatsapp?`<div style="margin-top:12px">${waCard(c)}</div>`:""}
+  <div class="sec"><h2>${t("Community Updates")}</h2>${ups.length>3?`<button class="link" data-a="go" data-v="updates">${t("View All ›")}</button>`:""}</div>
+  ${ups.slice(0,3).map(postHTML).join("")||empty("megaphone",t("No updates yet. News from your management will show here."))}
  </div>${tabs("home")}`};
-V.updates=()=>`${topbar("Community Updates")}<div class="body">${myUpdates().map(postHTML).join("")||empty("megaphone","No updates yet.")}</div>`;
+V.updates=()=>`${topbar(t("Community Updates"))}<div class="body">${myUpdates().map(postHTML).join("")||empty("megaphone",t("No updates yet."))}</div>`;
 
-const typeOf=id=>[...REQUEST_TYPES,...SERVICES].find(x=>x.id===id)||{en:id};
-const itemRow=r=>`<div class="row"><div class="t"><b>${esc(typeOf(r.type).en)}</b><span>${r.preferred_when?`Booked for ${esc(r.preferred_when)} · `:""}${fmtDate(r.created_at)} · Unit ${esc(r.units?.unit_no)}</span>${r.details?`<span>${esc(r.details)}</span>`:""}</div>${pill(r.status)}</div>`;
+const typeOf=id=>[...REQUEST_TYPES,...SERVICES].find(x=>x.id===id)||{en:id,ar:id};
+const slotT=w=>String(w||"").replace(/Morning|Afternoon|Evening/,m=>t(m));
+const itemRow=r=>`<div class="row"><div class="t"><b>${esc(typeName(typeOf(r.type)))}</b><span>${r.preferred_when?t("Booked for {w}",{w:esc(slotT(r.preferred_when))})+" · ":""}${fmtDate(r.created_at)} · ${t("Unit {u}",{u:esc(r.units?.unit_no)})}</span>${r.details?`<span dir="auto">${esc(r.details)}</span>`:""}</div>${pill(r.status)}</div>`;
 function catalog(kind){
- const k=kind==="request"?"rtab":"stab",first=kind==="request"?"New":"Services",t=tmp[k]||first,list=kind==="request"?REQUEST_TYPES:SERVICES;
+ const k=kind==="request"?"rtab":"stab",first=kind==="request"?"New":"Services",tb=tmp[k]||first,list=kind==="request"?REQUEST_TYPES:SERVICES;
  if(!unit())return needUnit();
  let inner;
- if(t===first)inner=`<div class="grid2">${list.map(x=>`<button class="tile" data-a="newItem" data-k="${kind}" data-v="${x.id}"><span class="art" style="background:color-mix(in srgb,${x.c} 16%,transparent);color:${x.c}">${I(x.ic)}</span><b>${esc(x.en)}</b><span class="ar">${esc(x.ar)}</span></button>`).join("")}</div>`;
- else{const rows=D.requests.filter(r=>r.kind===kind&&(t==="Open"?r.status!=="Closed":r.status==="Closed"));inner=rows.map(itemRow).join("")||empty("clip",t==="Open"?"Nothing open right now.":"No closed items yet.")}
+ if(tb===first)inner=`<div class="grid2">${list.map(x=>`<button class="tile" data-a="newItem" data-k="${kind}" data-v="${x.id}"><span class="art" style="background:color-mix(in srgb,${x.c} 16%,transparent);color:${x.c}">${I(x.ic)}</span><b>${esc(LANG==="ar"?x.ar:x.en)}</b>${LANG==="ar"?"":`<span class="ar">${esc(x.ar)}</span>`}</button>`).join("")}</div>`;
+ else{const rows=D.requests.filter(r=>r.kind===kind&&(tb==="Open"?r.status!=="Closed":r.status==="Closed"));inner=rows.map(itemRow).join("")||empty("clip",tb==="Open"?t("Nothing open right now."):t("No closed items yet."))}
  return `${segs(k,[first,"Open","History"])}<div style="height:12px"></div>${unitChip()}${inner}`;
 }
-V.requests=()=>`${topbar("Requests")}<div class="body">${catalog("request")}</div>`;
-V.services=()=>`${topbar("Services",{noBack:true})}<div class="body">${catalog("service")}</div>${tabs("services")}`;
-V.discover=()=>`${topbar("Discover",{noBack:true})}<div class="body">
- <div class="sec" style="margin-top:6px"><h2>Categories</h2></div>
- <div class="grid2">${[["Short numbers","phone","var(--teal)","directory"],["Community guidelines","book","var(--coral)","guidelines"],["Help Center","help","var(--amber)","help"],["My properties","building","var(--ink)","properties"]].map(([l,ic,c,to])=>`<button class="tile" style="min-height:120px" data-a="go" data-v="${to}"><span class="art" style="background:color-mix(in srgb,${c} 16%,transparent);color:${c}">${I(ic)}</span><b>${l}</b></button>`).join("")}</div>
- </div>${tabs("discover")}`;
+V.requests=()=>`${topbar(t("Requests"))}<div class="body">${catalog("request")}</div>`;
+V.services=()=>`${topbar(t("Services"),{noBack:true})}<div class="body">${catalog("service")}</div>${tabs("services")}`;
+V.discover=()=>{const c=comm();return `${topbar(t("Discover"),{noBack:true})}<div class="body">
+ ${c?.whatsapp?`<div style="margin:6px 0 4px">${waCard(c)}</div>`:""}
+ <div class="sec" style="margin-top:12px"><h2>${t("Categories")}</h2></div>
+ <div class="grid2">${[["Short numbers","phone","var(--teal)","directory"],["Community guidelines","book","var(--coral)","guidelines"],["Help Center","help","var(--amber)","help"],["My properties","building","var(--ink)","properties"]].map(([l,ic,col,to])=>`<button class="tile" style="min-height:120px" data-a="go" data-v="${to}"><span class="art" style="background:color-mix(in srgb,${col} 16%,transparent);color:${col}">${I(ic)}</span><b>${t(l)}</b></button>`).join("")}</div>
+ </div>${tabs("discover")}`};
 
-V.badge=()=>{const u=unit();if(!u)return `${topbar("Identity Badge")}<div class="body">${needUnit()}</div>`;const ok=u.status==="approved";return `${topbar("Identity Badge")}<div class="body">
- ${ok?"":`<div class="banner" style="margin:0 0 14px">${I("alert")}<span>Your badge activates after the management approves ${esc(unitLabel(u))}.</span></div>`}
+V.badge=()=>{const u=unit();if(!u)return `${topbar(t("Identity Badge"))}<div class="body">${needUnit()}</div>`;const ok=u.status==="approved";return `${topbar(t("Identity Badge"))}<div class="body">
+ ${ok?"":`<div class="banner" style="margin:0 0 14px">${I("alert")}<span>${t("Your badge activates after the management approves {u}.",{u:esc(unitLabel(u))})}</span></div>`}
  <div class="badge" style="${ok?"":"opacity:.55"}">
-  <div style="display:flex;gap:12px;align-items:center"><span class="avatar lg" style="background:var(--bg);color:var(--ink)">${initials(D.profile.full_name)}</span><div><small>Resident</small><b style="display:block;font-size:20px">${esc(D.profile.full_name)}</b><span style="opacity:.8;font-weight:700">${esc(D.profile.relation||"")}</span></div></div>
+  <div style="display:flex;gap:12px;align-items:center"><span class="avatar lg" style="background:var(--bg);color:var(--ink)">${initials(D.profile.full_name)}</span><div><small>${t("Resident")}</small><b style="display:block;font-size:20px">${esc(D.profile.full_name)}</b><span style="opacity:.8;font-weight:700">${esc(t(D.profile.relation||""))}</span></div></div>
   ${ok?'<div class="qr" id="qr"></div>':""}
-  <div class="kv"><div><small>Community</small><b>${esc(u.communities?.name)}</b></div><div><small>Unit</small><b>${esc(u.unit_no)}</b></div><div><small>Badge no.</small><b>${esc(u.id.slice(0,8).toUpperCase())}</b></div><div><small>Status</small><b>${ok?"Active":LBL[u.status]}</b></div></div>
- </div>${ok?'<p class="note">Show this QR code to security at the gate.</p>':""}</div>`};
+  <div class="kv"><div><small>${t("Community")}</small><b>${esc(u.communities?.name)}</b></div><div><small>${t("Unit")}</small><b>${esc(u.unit_no)}</b></div><div><small>${t("Badge no.")}</small><b>${esc(u.id.slice(0,8).toUpperCase())}</b></div><div><small>${t("Status")}</small><b>${ok?t("Active"):t(LBL[u.status])}</b></div></div>
+ </div>${ok?`<p class="note">${t("Show this QR code to security at the gate.")}</p>`:""}</div>`};
 
-V.gatepass=()=>`${topbar("Gate Pass")}<div class="body">
- <button class="btn cta" data-a="newPass" style="margin:6px 0 20px">${I("plus")}Create new gate pass</button>
- ${D.passes.map(p=>`<button class="row" data-a="showPass" data-v="${p.id}"><span class="avatar">${initials(p.guest)}</span><div class="t"><b>${esc(p.guest)}</b><span>${fmtDate(p.visit_date)} · ${esc(p.valid_for)}${p.car_plate?" · Car "+esc(p.car_plate):""}</span></div>${I("right")}</button>`).join("")||empty("ticket","No gate passes yet. Create one to invite a guest.")}</div>`;
+V.gatepass=()=>`${topbar(t("Gate Pass"))}<div class="body">
+ <button class="btn cta" data-a="newPass" style="margin:6px 0 20px">${I("plus")}${t("Create new gate pass")}</button>
+ ${D.passes.map(p=>`<button class="row" data-a="showPass" data-v="${p.id}"><span class="avatar">${initials(p.guest)}</span><div class="t"><b>${esc(p.guest)}</b><span>${fmtDate(p.visit_date)} · ${esc(t(p.valid_for))}${p.car_plate?" · "+t("Car")+" "+esc(p.car_plate):""}</span></div>${I("right","flip")}</button>`).join("")||empty("ticket",t("No gate passes yet. Create one to invite a guest."))}</div>`;
 
-V.gatenote=()=>`${topbar("Gate Notification")}<div class="body">
- <p class="sub" style="margin:4px 0 16px;line-height:1.5">Tell security about a delivery, taxi or limousine so they let it in without calling you.</p>
- <div class="field"><label>Type</label>${segs("gtype",["Delivery","Taxi / Limo","Maintenance"])}</div>
- <div class="field"><label for="g-name">Company or driver name</label><input class="in" id="g-name" placeholder="e.g. Talabat, Uber"></div>
- <div class="field"><label for="g-plate">Plate number (optional)</label><input class="in" id="g-plate" placeholder="ا ب ج 123"></div>
- <button class="btn" data-a="notifyGate">Notify gate</button>
- <div class="sec"><h2>Recent</h2></div>
- ${D.notes.map(g=>`<div class="row">${I("truck")}<div class="t"><b>${esc(g.kind)} · ${esc(g.name)}</b><span>${esc(g.plate||"No plate")} · ${ago(g.created_at)}</span></div></div>`).join("")||empty("gate","No notifications sent yet.")}</div>`;
+V.gatenote=()=>`${topbar(t("Gate Notification"))}<div class="body">
+ <p class="sub" style="margin:4px 0 16px;line-height:1.5">${t("Tell security about a delivery, taxi or limousine so they let it in without calling you.")}</p>
+ <div class="field"><label>${t("Type")}</label>${segs("gtype",["Delivery","Taxi / Limo","Maintenance"])}</div>
+ <div class="field"><label for="g-name">${t("Company or driver name")}</label><input class="in" id="g-name" placeholder="Talabat, Uber"></div>
+ <div class="field"><label for="g-plate">${t("Plate number (optional)")}</label><input class="in" id="g-plate" placeholder="ا ب ج 123"></div>
+ <button class="btn" data-a="notifyGate">${t("Notify gate")}</button>
+ <div class="sec"><h2>${t("Recent")}</h2></div>
+ ${D.notes.map(g=>`<div class="row">${I("truck")}<div class="t"><b>${esc(t(g.kind))} · ${esc(g.name)}</b><span>${esc(g.plate||t("No plate"))} · ${ago(g.created_at)}</span></div></div>`).join("")||empty("gate",t("No notifications sent yet."))}</div>`;
 
-V.complaints=()=>`${topbar("Complaints")}<div class="body">
- ${unit()?`<button class="btn" data-a="newComplaint" style="margin:6px 0 20px">${I("plus")}New complaint</button>`:needUnit()}
- ${D.complaints.map(c=>`<div class="row"><div class="t"><b>${esc(c.category)}</b><span>${esc(c.body)}</span><span>${fmtDate(c.created_at)} · Unit ${esc(c.units?.unit_no)}</span></div>${pill(c.status)}</div>`).join("")||(unit()?empty("chat","No complaints. That's a good sign."):"")}</div>`;
+V.complaints=()=>`${topbar(t("Complaints"))}<div class="body">
+ ${unit()?`<button class="btn" data-a="newComplaint" style="margin:6px 0 20px">${I("plus")}${t("New complaint")}</button>`:needUnit()}
+ ${D.complaints.map(c=>`<div class="row"><div class="t"><b>${esc(t(c.category))}</b><span dir="auto">${esc(c.body)}</span><span>${fmtDate(c.created_at)} · ${t("Unit {u}",{u:esc(c.units?.unit_no)})}</span></div>${pill(c.status)}</div>`).join("")||(unit()?empty("chat",t("No complaints. That's a good sign.")):"")}</div>`;
 
-V.violations=()=>`${topbar("Violations")}<div class="body">
- ${D.violations.map(v=>`<div class="row">${I("shield")}<div class="t"><b>${esc(v.reason)}</b><span>${fmtDate(v.created_at)} · Unit ${esc(v.units?.unit_no)}${v.fine?` · Fine EGP ${esc(v.fine)}`:""}</span></div>${pill(v.status)}</div>`).join("")||empty("shield","No violations on your units.")}</div>`;
+V.violations=()=>`${topbar(t("Violations"))}<div class="body">
+ ${D.violations.map(v=>`<div class="row">${I("shield")}<div class="t"><b dir="auto">${esc(v.reason)}</b><span>${fmtDate(v.created_at)} · ${t("Unit {u}",{u:esc(v.units?.unit_no)})}${v.fine?" · "+t("Fine EGP {f}",{f:esc(v.fine)}):""}</span></div>${pill(v.status)}</div>`).join("")||empty("shield",t("No violations on your units."))}</div>`;
 
-V.notifs=()=>`${topbar("Notifications")}<div class="body">${D.notifs.map(n=>`<div class="row" style="${n.read?"":"box-shadow:inset 3px 0 0 var(--coral)"}">${I("bell")}<div class="t"><b>${esc(n.title)}</b><span dir="auto">${esc(n.body)}</span><span>${ago(n.created_at)}</span></div></div>`).join("")||empty("bell","You're all caught up.")}</div>`;
+V.notifs=()=>{const unread=D.notifs.filter(n=>!n.read).map(n=>n.id);
+ if(unread.length)sb.from("notifications").update({read:true}).in("id",unread).then(()=>D.notifs.forEach(n=>n.read=true));
+ return `${topbar(t("Notifications"))}<div class="body">${D.notifs.map(n=>{const ti=LANG==="ar"&&n.title_ar?n.title_ar:n.title;const bo=LANG==="ar"&&n.body_ar?n.body_ar:n.body;return `<div class="row" style="${n.read?"":"box-shadow:inset -3px 0 0 var(--coral)"}">${I("bell")}<div class="t"><b>${esc(ti)}</b><span dir="auto">${esc(bo)}</span><span>${ago(n.created_at)}</span></div></div>`}).join("")||empty("bell",t("You're all caught up."))}</div>`};
 
-V.directory=()=>{const c=comm();if(!c)return `${topbar("Phone Directory")}<div class="body">${needUnit()}</div>`;
+V.directory=()=>{const c=comm();if(!c)return `${topbar(t("Phone Directory"))}<div class="body">${needUnit()}</div>`;
  const nums=[["Security gate",c.security_phone,"shield"],["Management office",c.office_phone,"building"],["Maintenance",c.maintenance_phone,"wrench"]].filter(x=>x[1]);
- return `${topbar("Phone Directory")}<div class="body">
- <div class="hero" style="flex-direction:column;text-align:center">${hubMark("sm")}<b style="font-size:20px">${esc(c.name)} Call Center</b>${c.call_center?`<a href="tel:${esc(c.call_center)}" style="font-size:28px;font-weight:900;color:var(--teal);text-decoration:none;font-variant-numeric:tabular-nums">${esc(c.call_center)}</a><span class="link">Tap to call</span>`:'<span class="sub">Not added yet</span>'}</div>
- <div class="sec"><h2>Short numbers</h2></div>
- ${nums.map(([l,n,ic])=>`<a class="row" href="tel:${esc(n)}" style="color:inherit;text-decoration:none">${I(ic)}<div class="t"><b>${l}</b><span style="font-size:15px;color:var(--ink);font-variant-numeric:tabular-nums">${esc(n)}</span></div>${I("phone")}</a>`).join("")||empty("phone","The management hasn't added numbers yet.")}</div>`};
+ return `${topbar(t("Phone Directory"))}<div class="body">
+ <div class="hero" style="flex-direction:column;text-align:center">${hubMark("sm")}<b style="font-size:20px">${t("{c} Call Center",{c:esc(c.name)})}</b>${c.call_center?`<a href="tel:${esc(c.call_center)}" dir="ltr" style="font-size:28px;font-weight:900;color:var(--teal);text-decoration:none;font-variant-numeric:tabular-nums">${esc(c.call_center)}</a><span class="link">${t("Tap to call")}</span>`:`<span class="sub">${t("Not added yet")}</span>`}</div>
+ ${c.whatsapp?`<div style="margin-top:12px">${waCard(c)}</div>`:""}
+ <div class="sec"><h2>${t("Short numbers")}</h2></div>
+ ${nums.map(([l,n,ic])=>`<a class="row" href="tel:${esc(n)}" style="color:inherit;text-decoration:none">${I(ic)}<div class="t"><b>${t(l)}</b><span dir="ltr" style="font-size:15px;color:var(--ink);font-variant-numeric:tabular-nums;text-align:start">${esc(n)}</span></div>${I("phone")}</a>`).join("")||empty("phone",t("The management hasn't added numbers yet."))}</div>`};
 
-V.guidelines=()=>{const c=comm();return `${topbar("Community Guidelines")}<div class="body">${c?.guidelines?`<div class="post"><p dir="auto">${esc(c.guidelines)}</p></div>`:empty("book","The management hasn't published guidelines yet.")}</div>`};
+V.guidelines=()=>{const c=comm();return `${topbar(t("Community guidelines"))}<div class="body">${c?.guidelines?`<div class="post"><p dir="auto">${esc(c.guidelines)}</p></div>`:empty("book",t("The management hasn't published guidelines yet."))}</div>`};
 
-V.help=()=>`${topbar("Help Center")}<div class="body">
- <button class="btn" data-a="go" data-v="directory" style="margin:6px 0 20px">Contact us</button>
- <h2 style="font-size:22px;margin:0 0 6px">Frequently asked questions</h2>
- <p class="sub" style="margin:0 0 14px">Quick answers on how to use the app.</p>
- ${FAQ.map(([qq,steps])=>`<details class="acc"><summary>${qq}${I("down")}</summary><ol>${steps.map(s=>`<li>${s}</li>`).join("")}</ol></details>`).join("")}</div>`;
+V.help=()=>{const c=comm();return `${topbar(t("Help Center"))}<div class="body">
+ ${c?.whatsapp?`<div style="margin:6px 0 20px">${waCard(c)}</div>`:`<button class="btn" data-a="go" data-v="directory" style="margin:6px 0 20px">${t("Contact us")}</button>`}
+ <h2 style="font-size:22px;margin:0 0 6px">${t("Frequently asked questions")}</h2>
+ <p class="sub" style="margin:0 0 14px">${t("Quick answers on how to use the app.")}</p>
+ ${faq().map(([qq,steps])=>`<details class="acc"><summary>${qq}${I("down")}</summary><ol>${steps.map(s=>`<li>${s}</li>`).join("")}</ol></details>`).join("")}</div>`};
 
-V.properties=()=>`${topbar("Manage properties")}<div class="body">
- ${D.units.map(u=>`<button class="row" data-a="setUnit" data-v="${u.id}">${I(u.id===unit()?.id?"check":"home")}<div class="t"><b>${esc(u.communities?.name)} · ${esc(u.unit_no)}</b><span>${esc(u.communities?.district)} · ${esc(u.unit_type)}</span></div>${pill(u.status)}</button>`).join("")||empty("building","No units yet.")}
- <button class="btn" data-a="addUnit" style="margin-top:12px">${I("plus")}Add a new unit</button></div>`;
+V.properties=()=>`${topbar(t("Manage properties"))}<div class="body">
+ ${D.units.map(u=>`<button class="row" data-a="setUnit" data-v="${u.id}">${I(u.id===unit()?.id?"check":"home")}<div class="t"><b>${esc(u.communities?.name)} · ${esc(u.unit_no)}</b><span>${esc(u.communities?.district)} · ${t(u.unit_type)}</span></div>${pill(u.status)}</button>`).join("")||empty("building",t("No units yet."))}
+ <button class="btn" data-a="addUnit" style="margin-top:12px">${I("plus")}${t("Add a new unit")}</button></div>`;
 
-V.profileView=()=>`${topbar("My account")}<div class="body">
- <div style="display:flex;flex-direction:column;align-items:center;gap:8px;margin:10px 0 22px"><span class="avatar lg">${initials(D.profile.full_name)}</span><b style="font-size:20px">${esc(D.profile.full_name)}</b><span class="sub">${esc(D.profile.email)}</span>${isMgr()?pill("Active").replace("Active","App manager"):""}</div>
- <div class="row">${I("phone")}<div class="t"><b>${esc(D.profile.phone)}</b><span>Mobile</span></div></div>
- ${D.profile.relation?`<div class="row">${I("user")}<div class="t"><b>${esc(D.profile.relation)}</b><span>Relation to unit</span></div></div>`:""}
- <button class="btn ghost" data-a="editProfile" style="margin:10px 0">Edit profile</button>
- <button class="btn ghost" data-a="logout" style="margin-bottom:10px">Sign out</button>
- ${isMgr()?"":`<button class="btn danger" data-a="askDelete">Delete my account</button>`}</div>`;
+V.profileView=()=>`${topbar(t("My account"))}<div class="body">
+ <div style="display:flex;flex-direction:column;align-items:center;gap:8px;margin:10px 0 22px"><span class="avatar lg">${initials(D.profile.full_name)}</span><b style="font-size:20px">${esc(D.profile.full_name)}</b><span class="sub" dir="ltr">${esc(D.profile.email)}</span>${isMgr()?`<span class="pill p-ok">${t("App manager")}</span>`:""}</div>
+ <div class="row">${I("phone")}<div class="t"><b dir="ltr" style="text-align:start">${esc(D.profile.phone)}</b><span>${t("Mobile")}</span></div></div>
+ ${D.profile.relation?`<div class="row">${I("user")}<div class="t"><b>${esc(t(D.profile.relation))}</b><span>${t("Relation to unit")}</span></div></div>`:""}
+ <div class="field" style="margin-top:6px"><label>${t("Language")}</label>${langSwitch()}</div>
+ <button class="btn ghost" data-a="editProfile" style="margin:10px 0">${t("Edit profile")}</button>
+ <button class="btn ghost" data-a="logout" style="margin-bottom:10px">${t("Sign out")}</button>
+ ${isMgr()?"":`<button class="btn danger" data-a="askDelete">${t("Delete my account")}</button>`}</div>`;
 
-/* ---------- manager ---------- */
+/* ---------- manager (only rendered for role = manager; the database also enforces this) ---------- */
 V.manager=()=>{if(!isMgr())return V.home();
- const pend=D.m.units.filter(u=>u.status==="pending");const t=tmp.mtab||"Approvals";let inner="";
- if(t==="Approvals"){
-  inner=pend.map(u=>`<div class="row" style="flex-wrap:wrap"><span class="avatar">${initials(u.profiles?.full_name)}</span><div class="t"><b>${esc(u.profiles?.full_name||u.profiles?.email)}</b><span>${esc(u.communities?.name)} · Unit ${esc(u.unit_no)} · ${esc(u.unit_type)}</span><span>${esc(u.profiles?.relation||"")} · ${esc(u.profiles?.phone||"")} · ${esc(u.profiles?.email||"")}</span></div><div class="sel-row" style="width:100%;margin-top:4px"><button class="btn small" data-a="setUnitStatus" data-v="${u.id}" data-s="approved">${I("check")}Approve</button><button class="btn small ghost" data-a="setUnitStatus" data-v="${u.id}" data-s="rejected">Reject</button></div></div>`).join("")||empty("users","No residents waiting for approval.");
+ const pend=D.m.units.filter(u=>u.status==="pending");const tb=tmp.mtab||"Approvals";let inner="";
+ if(tb==="Approvals"){
+  inner=pend.map(u=>`<div class="row" style="flex-wrap:wrap"><span class="avatar">${initials(u.profiles?.full_name)}</span><div class="t"><b>${esc(u.profiles?.full_name||u.profiles?.email)}</b><span>${esc(u.communities?.name)} · ${t("Unit {u}",{u:esc(u.unit_no)})} · ${t(u.unit_type)}</span><span>${esc(t(u.profiles?.relation||""))} · <bdi>${esc(u.profiles?.phone||"")}</bdi> · <bdi>${esc(u.profiles?.email||"")}</bdi></span></div><div class="sel-row" style="width:100%;margin-top:4px"><button class="btn small" data-a="setUnitStatus" data-v="${u.id}" data-s="approved">${I("check")}${t("Approve")}</button><button class="btn small ghost" data-a="setUnitStatus" data-v="${u.id}" data-s="rejected">${t("Reject")}</button></div></div>`).join("")||empty("users",t("No residents waiting for approval."));
   const appr=D.m.units.filter(u=>u.status==="approved");
-  if(appr.length)inner+=`<div class="sec"><h2>Approved residents (${appr.length})</h2></div>`+appr.map(u=>`<div class="row"><span class="avatar">${initials(u.profiles?.full_name)}</span><div class="t"><b>${esc(u.profiles?.full_name)}</b><span>${esc(u.communities?.name)} · Unit ${esc(u.unit_no)} · ${esc(u.profiles?.phone||"")}</span></div>${pill("approved")}</div>`).join("");
+  if(appr.length)inner+=`<div class="sec"><h2>${t("Approved residents ({n})",{n:appr.length})}</h2></div>`+appr.map(u=>`<div class="row"><span class="avatar">${initials(u.profiles?.full_name)}</span><div class="t"><b>${esc(u.profiles?.full_name)}</b><span>${esc(u.communities?.name)} · ${t("Unit {u}",{u:esc(u.unit_no)})} · <bdi>${esc(u.profiles?.phone||"")}</bdi></span></div>${pill("approved")}</div>`).join("");
  }
- if(t==="Requests")inner=[...D.m.requests.map(r=>({...r,_k:"requests",_t:typeOf(r.type).en,_b:[r.preferred_when&&"Booked for "+r.preferred_when,r.details].filter(Boolean).join(" · ")})),...D.m.complaints.map(c=>({...c,_k:"complaints",_t:"Complaint · "+c.category,_b:c.body}))]
+ if(tb==="Requests")inner=[...D.m.requests.map(r=>({...r,_k:"requests",_t:typeName(typeOf(r.type)),_b:[r.preferred_when&&t("Booked for {w}",{w:slotT(r.preferred_when)}),r.details].filter(Boolean).join(" · ")})),...D.m.complaints.map(c=>({...c,_k:"complaints",_t:t("Complaint")+" · "+t(c.category),_b:c.body}))]
   .sort((a,b)=>new Date(b.created_at)-new Date(a.created_at))
-  .map(r=>`<div class="row" style="flex-wrap:wrap"><div class="t"><b>${esc(r._t)}</b><span>${esc(r.units?.communities?.name)} · Unit ${esc(r.units?.unit_no)} · ${esc(r.profiles?.full_name||"")} · ${esc(r.profiles?.phone||"")}</span>${r._b?`<span dir="auto">${esc(r._b)}</span>`:""}<span>${fmtDate(r.created_at)}</span></div>${pill(r.status)}<div class="sel-row" style="width:100%">${r.status==="Open"?`<button class="btn small ghost" data-a="setStatus" data-k="${r._k}" data-v="${r.id}" data-s="In progress">Mark in progress</button>`:""}<button class="btn small ghost" data-a="setStatus" data-k="${r._k}" data-v="${r.id}" data-s="Closed">Close</button></div></div>`).join("")||empty("clip","No open requests or complaints.");
- if(t==="Post"){const cs=D.communities.map(c=>[c.id,c.name+" · "+c.district]);
-  if(!cs.length)inner=empty("building","Add a community first.");
-  else inner=`<div class="field"><label for="m-pc">Community</label>${selHTML("m-pc","Choose community",cs,cs.length===1?cs[0][0]:"")}</div>
-  <div class="field"><label for="m-post">Announcement</label><textarea class="in" id="m-post" dir="auto" placeholder="e.g. The pool opens Friday at 9 am."></textarea></div>
-  <button class="btn cta" data-a="publish">Publish update</button>
-  <div class="sec"><h2>Issue a violation</h2></div>
-  ${D.m.units.some(u=>u.status==="approved")?`<div class="field"><label for="m-vu">Unit</label>${selHTML("m-vu","Choose unit",D.m.units.filter(u=>u.status==="approved").map(u=>[u.id,`${u.communities?.name} · ${u.unit_no} · ${u.profiles?.full_name||""}`]))}</div>
-  <div class="field"><label for="m-vr">Reason</label><input class="in" id="m-vr" placeholder="e.g. Parking in fire lane"></div>
-  <div class="field"><label for="m-vf">Fine (EGP, optional)</label><input class="in" id="m-vf" inputmode="numeric" placeholder="500"></div>
-  <button class="btn ghost" data-a="issueViolation">Issue violation</button>`:empty("shield","Violations can be issued once residents are approved.")}
-  <div class="sec"><h2>Recent updates</h2></div>${D.updates.slice(0,10).map(p=>`<div class="row"><div class="t"><b>${esc(p.communities?.name)}</b><span dir="auto">${esc(p.body)}</span><span>${ago(p.created_at)}</span></div><button class="iconbtn" data-a="delUpdate" data-v="${p.id}" aria-label="Delete update">${I("trash")}</button></div>`).join("")||empty("megaphone","Nothing published yet.")}`}
- if(t==="Communities")inner=`<button class="btn" data-a="editComm" style="margin-bottom:16px">${I("plus")}Add community</button>`+(D.communities.map(c=>`<button class="row" data-a="editComm" data-v="${c.id}">${I("building")}<div class="t"><b>${esc(c.name)}</b><span>${esc(c.district)} · ${D.m.units.filter(u=>u.community_id===c.id&&u.status==="approved").length} approved units</span></div>${I("right")}</button>`).join("")||empty("building","No communities yet. Residents can register once you add one."));
- return `${topbar("Manager panel",{noBack:true,right:`<button class="iconbtn" data-a="drawer" aria-label="Open menu">${I("menu")}</button>`})}<div class="body">
- <div class="grid3" style="margin:4px 0 16px"><div class="stat"><b>${pend.length}</b><span>Pending residents</span></div><div class="stat"><b>${D.m.requests.length}</b><span>Open requests</span></div><div class="stat"><b>${D.m.complaints.length}</b><span>Open complaints</span></div></div>
+  .map(r=>`<div class="row" style="flex-wrap:wrap"><div class="t"><b>${esc(r._t)}</b><span>${esc(r.units?.communities?.name)} · ${t("Unit {u}",{u:esc(r.units?.unit_no)})} · ${esc(r.profiles?.full_name||"")} · <bdi>${esc(r.profiles?.phone||"")}</bdi></span>${r._b?`<span dir="auto">${esc(r._b)}</span>`:""}<span>${fmtDate(r.created_at)}</span></div>${pill(r.status)}<div class="sel-row" style="width:100%">${r.status==="Open"?`<button class="btn small ghost" data-a="setStatus" data-k="${r._k}" data-v="${r.id}" data-s="In progress">${t("Mark in progress")}</button>`:""}<button class="btn small ghost" data-a="setStatus" data-k="${r._k}" data-v="${r.id}" data-s="Closed">${t("Close")}</button></div></div>`).join("")||empty("clip",t("No open requests or complaints."));
+ if(tb==="Post"){const cs=D.communities.map(c=>[c.id,c.name+" · "+c.district]);
+  if(!cs.length)inner=empty("building",t("Add a community first."));
+  else inner=`<div class="field"><label for="m-pc">${t("Community")}</label>${selHTML("m-pc",t("Choose community"),cs,cs.length===1?cs[0][0]:"")}</div>
+  <div class="field"><label for="m-post">${t("Announcement")}</label><textarea class="in" id="m-post" dir="auto" placeholder="${t("e.g. The pool opens Friday at 9 am.")}"></textarea></div>
+  <button class="btn cta" data-a="publish">${t("Publish update")}</button>
+  <div class="sec"><h2>${t("Issue a violation")}</h2></div>
+  ${D.m.units.some(u=>u.status==="approved")?`<div class="field"><label for="m-vu">${t("Unit")}</label>${selHTML("m-vu",t("Choose unit"),D.m.units.filter(u=>u.status==="approved").map(u=>[u.id,`${u.communities?.name} · ${u.unit_no} · ${u.profiles?.full_name||""}`]))}</div>
+  <div class="field"><label for="m-vr">${t("Reason")}</label><input class="in" id="m-vr" dir="auto" placeholder="${t("e.g. Parking in fire lane")}"></div>
+  <div class="field"><label for="m-vf">${t("Fine (EGP, optional)")}</label><input class="in" id="m-vf" dir="ltr" inputmode="numeric" placeholder="500"></div>
+  <button class="btn ghost" data-a="issueViolation">${t("Issue violation")}</button>`:empty("shield",t("Violations can be issued once residents are approved."))}
+  <div class="sec"><h2>${t("Recent updates")}</h2></div>${D.updates.slice(0,10).map(p=>`<div class="row"><div class="t"><b>${esc(p.communities?.name)}</b><span dir="auto">${esc(p.body)}</span><span>${ago(p.created_at)}</span></div><button class="iconbtn" data-a="delUpdate" data-v="${p.id}" aria-label="Delete">${I("trash")}</button></div>`).join("")||empty("megaphone",t("Nothing published yet."))}`}
+ if(tb==="Communities")inner=`<button class="btn" data-a="editComm" style="margin-bottom:16px">${I("plus")}${t("Add community")}</button>`+(D.communities.map(c=>`<button class="row" data-a="editComm" data-v="${c.id}">${I("building")}<div class="t"><b>${esc(c.name)}</b><span>${esc(c.district)} · ${t("{n} approved units",{n:D.m.units.filter(u=>u.community_id===c.id&&u.status==="approved").length})}${c.whatsapp?" · "+t("WhatsApp")+" ✓":""}</span></div>${I("right","flip")}</button>`).join("")||empty("building",t("No communities yet. Residents can register once you add one.")));
+ return `${topbar(t("Manager panel"),{noBack:true,right:`<button class="iconbtn" data-a="drawer" aria-label="Menu">${I("menu")}</button>`})}<div class="body">
+ <div class="grid3" style="margin:4px 0 16px"><div class="stat"><b>${pend.length}</b><span>${t("Pending residents")}</span></div><div class="stat"><b>${D.m.requests.length}</b><span>${t("Open requests")}</span></div><div class="stat"><b>${D.m.complaints.length}</b><span>${t("Open complaints")}</span></div></div>
  <div class="hscroll">${segs("mtab",["Approvals","Requests","Post","Communities"])}</div><div style="height:14px"></div>${inner}</div>${tabs("manager")}`};
 
 /* ---------- drawer, sheet, toast ---------- */
 function drawerHTML(){const items=[["badge","ID Badge","badge"],["gatepass","Gate Pass","ticket"],["gatenote","Gate Notification","gate"],["requests","Requests","clip"],["complaints","Complaints","chat"],["violations","Violations","shield"],["guidelines","Community Info","book"],["directory","Phone Directory","phone"],["help","Help Center","help"],["properties","Manage properties","building"]];
- return `<button class="me" data-a="go" data-v="profileView"><span class="avatar lg">${initials(D.profile?.full_name)}</span><div style="min-width:0"><b style="font-size:17px;display:block">${esc(D.profile?.full_name)}</b><span class="sub">${esc(isMgr()?"App manager":unitLabel(unit()))}</span></div></button>
- <nav>${isMgr()?`<button class="mi mgr" data-a="tab" data-v="manager">${I("settings")}Manager panel</button>`:""}${items.map(([k,l,ic])=>`<button class="mi" data-a="go" data-v="${k}">${I(ic)}${l}</button>`).join("")}</nav>
- <button class="mi" data-a="logout">${I("logout")}Sign out</button>`}
+ const c=comm();
+ return `<button class="me" data-a="go" data-v="profileView"><span class="avatar lg">${initials(D.profile?.full_name)}</span><div style="min-width:0"><b style="font-size:17px;display:block">${esc(D.profile?.full_name)}</b><span class="sub">${esc(isMgr()?t("App manager"):unitLabel(unit()))}</span></div></button>
+ <nav>${isMgr()?`<button class="mi mgr" data-a="tab" data-v="manager">${I("settings")}${t("Manager panel")}</button>`:""}${items.map(([k,l,ic])=>`<button class="mi" data-a="go" data-v="${k}">${I(ic)}${t(l)}</button>`).join("")}
+ ${c?.whatsapp?`<a class="mi" style="color:#1E9E57;text-decoration:none" href="${waLink(c)}" target="_blank" rel="noopener">${WA}${t("Chat with customer service")}</a>`:""}
+ <button class="mi" data-a="langSheet">${I("compass")}${t("Language")} · ${LANG==="ar"?"العربية":"English"}</button></nav>
+ <button class="mi" data-a="logout">${I("logout")}${t("Sign out")}</button>`}
 function openDrawer(){$("#drawer").innerHTML=drawerHTML();$("#drawer").classList.add("on");$("#scrim").classList.add("on")}
 function closeDrawer(){$("#drawer").classList.remove("on");$("#scrim").classList.remove("on")}
 function sheet(title,body,sub=""){$("#sheetIn").innerHTML=`<div class="sh"><h3>${title}</h3>${sub?`<div class="sub">${sub}</div>`:""}</div><div class="sb">${body}</div>`;$("#sheet").classList.add("on");$("#scrim2").classList.add("on")}
 function closeSheet(){$("#sheet").classList.remove("on");$("#scrim2").classList.remove("on")}
-let tt;function toast(m){const t=$("#toast");t.textContent=m;t.classList.add("on");clearTimeout(tt);tt=setTimeout(()=>t.classList.remove("on"),2600)}
+let tt;function toast(m){const el=$("#toast");el.textContent=m;el.classList.add("on");clearTimeout(tt);tt=setTimeout(()=>el.classList.remove("on"),2600)}
 function qr(el,text){if(!el)return;el.innerHTML="";try{new QRCode(el,{text,width:168,height:168,colorDark:"#102A43",colorLight:"#ffffff"})}catch(e){el.textContent=text}}
 function render(){$("#screen").innerHTML=(V[route.name]||V.home)();
  if(route.name==="badge"&&unit()?.status==="approved")qr(document.getElementById("qr"),"HUB-BADGE:"+unit().id);
  const b=document.querySelector("#screen .body");if(b)b.scrollTop=0}
 const err=m=>{const e=document.getElementById("err");if(e)e.textContent=m};
-async function busy(el,fn){if(el?.disabled)return;if(el)el.disabled=true;try{await fn()}catch(e){toast(e.message||"Something went wrong")}finally{if(el)el.disabled=false}}
+async function busy(el,fn){if(el?.disabled)return;if(el)el.disabled=true;try{await fn()}catch(e){toast(e.message||t("Something went wrong"))}finally{if(el)el.disabled=false}}
 
 /* ---------- actions ---------- */
 const A={
@@ -580,83 +715,88 @@ const A={
    tmp[el.dataset.k]=el.dataset.v;render();
    Object.keys(tmp).filter(k=>k.startsWith("_v_")).forEach(k=>{const i=document.getElementById(k.slice(3));if(i&&!i.disabled&&i.tagName!=="SELECT")i.value=tmp[k]});
    Object.keys(tmp).filter(k=>k.startsWith("_v_")).forEach(k=>delete tmp[k])},
+ setLang(el){const keep={};document.querySelectorAll("#screen input,#screen textarea").forEach(i=>{if(i.id&&!i.disabled)keep[i.id]=i.value});
+   LANG=el.dataset.v;lsSet("hub-lang",LANG);applyLang();closeSheet();closeDrawer();render();
+   Object.entries(keep).forEach(([id,v])=>{const i=document.getElementById(id);if(i)i.value=v});
+   if(D.profile)sb.from("profiles").update({lang:LANG}).eq("id",D.profile.id).then(()=>{})},
+ langSheet(){closeDrawer();sheet(t("Choose your language"),`<button class="row" data-a="setLang" data-v="ar">${I(LANG==="ar"?"check":"compass")}<div class="t"><b>العربية</b></div></button><button class="row" data-a="setLang" data-v="en">${I(LANG==="en"?"check":"compass")}<div class="t"><b>English</b></div></button>`)},
  google:el=>busy(el,async()=>{const {error}=await sb.auth.signInWithOAuth({provider:"google",options:{redirectTo:location.origin+location.pathname}});if(error)throw error}),
  saveProfile:el=>busy(el,async()=>{const name=val("f-name"),phone=val("f-phone").replace(/[\s-]/g,"");
-   if(!name)return err("Enter your full name.");if(!/^(\+?20|0020)?0?1[0125]\d{8}$/.test(phone))return err("Enter an Egyptian mobile number, e.g. 01012345678.");
-   const nid=val("f-nid");if(nid&&!/^\d{4}$/.test(nid))return err("Enter exactly 4 digits for the national ID.");
-   const patch={full_name:name,phone};if(!isMgr()){patch.relation=tmp.rel||D.profile.relation||"Owner";patch.nid_last4=nid||null}
+   if(!name)return err(t("Enter your full name."));if(!/^(\+?20|0020)?0?1[0125]\d{8}$/.test(phone))return err(t("Enter an Egyptian mobile number, e.g. 01012345678."));
+   const nid=val("f-nid");if(nid&&!/^\d{4}$/.test(nid))return err(t("Enter exactly 4 digits for the national ID."));
+   const patch={full_name:name,phone,lang:LANG};if(!isMgr()){patch.relation=tmp.rel||D.profile.relation||"Owner";patch.nid_last4=nid||null}
    D.profile=await q(sb.from("profiles").update(patch).eq("id",D.profile.id).select().single());
-   if(route.editing){back();toast("Profile saved")}else{tmp={};boot()}}),
+   if(route.editing){back();toast(t("Profile saved"))}else{tmp={};boot()}}),
  saveUnit:el=>busy(el,async()=>{const cid=val("f-comm"),u=val("f-unit");
-   if(!val("f-district"))return err("Choose your district.");if(!cid)return err("Choose your community.");if(!u)return err("Enter your unit number.");
-   if(D.units.some(x=>x.community_id===cid&&x.unit_no.toLowerCase()===u.toLowerCase()))return err("This unit is already on your account.");
+   if(!val("f-district"))return err(t("Choose your district."));if(!cid)return err(t("Choose your community."));if(!u)return err(t("Enter your unit number."));
+   if(D.units.some(x=>x.community_id===cid&&x.unit_no.toLowerCase()===u.toLowerCase()))return err(t("This unit is already on your account."));
    const row=await q(sb.from("units").insert({user_id:D.profile.id,community_id:cid,unit_no:u,unit_type:tmp.utype||"Apartment"}).select("*, communities(name,district)").single());
    lsSet("hub-active",row.id);const wasAdding=route.adding||D.units.length;tmp={};await load();
-   if(wasAdding){back();toast("Unit submitted for approval")}else go("submitted",{},false)}),
- switchUnit(){if(D.units.length<2)return go("properties");sheet("Switch unit",D.units.map(u=>`<button class="row" data-a="setUnit" data-v="${u.id}">${I(u.id===unit()?.id?"check":"home")}<div class="t"><b>${esc(u.communities?.name)} · ${esc(u.unit_no)}</b><span>${esc(u.communities?.district)}</span></div>${pill(u.status)}</button>`).join(""))},
- setUnit(el){lsSet("hub-active",el.dataset.v);closeSheet();home("home");toast("Switched unit")},
+   if(wasAdding){back();toast(t("Unit submitted for approval"))}else go("submitted",{},false)}),
+ switchUnit(){if(D.units.length<2)return go("properties");sheet(t("Switch unit"),D.units.map(u=>`<button class="row" data-a="setUnit" data-v="${u.id}">${I(u.id===unit()?.id?"check":"home")}<div class="t"><b>${esc(u.communities?.name)} · ${esc(u.unit_no)}</b><span>${esc(u.communities?.district)}</span></div>${pill(u.status)}</button>`).join(""))},
+ setUnit(el){lsSet("hub-active",el.dataset.v);closeSheet();home("home");toast(t("Switched unit"))},
  addUnit(){tmp={};go("community",{adding:true})},
- newItem(el){const kind=el.dataset.k,t=(kind==="request"?REQUEST_TYPES:SERVICES).find(x=>x.id===el.dataset.v);
-   sheet(esc(t.en),`
-   ${kind==="service"?`<div class="field"><label for="n-date">Preferred date</label><input class="in" id="n-date" type="date" min="${today()}" value="${today()}"></div>
-   <div class="field"><label>Time slot</label><div class="seg" id="slot">${["Morning","Afternoon","Evening"].map((s,i)=>`<button class="${i===0?"on":""}" data-a="pick">${s}</button>`).join("")}</div></div>`:""}
-   <div class="field"><label for="n-det">Details</label><textarea class="in" id="n-det" dir="auto" placeholder="Describe what you need"></textarea></div>
-   <button class="btn" data-a="submitItem" data-k="${kind}" data-v="${t.id}">${kind==="service"?"Book service":"Submit request"}</button>`,`<span class="ar">${esc(t.ar)}</span> · ${esc(unitLabel(unit()))}`)},
+ newItem(el){const kind=el.dataset.k,x=(kind==="request"?REQUEST_TYPES:SERVICES).find(z=>z.id===el.dataset.v);
+   sheet(esc(typeName(x)),`
+   ${kind==="service"?`<div class="field"><label for="n-date">${t("Preferred date")}</label><input class="in" id="n-date" type="date" min="${today()}" value="${today()}"></div>
+   <div class="field"><label>${t("Time slot")}</label><div class="seg" id="slot">${["Morning","Afternoon","Evening"].map((s,i)=>`<button class="${i===0?"on":""}" data-a="pick" data-v="${s}">${t(s)}</button>`).join("")}</div></div>`:""}
+   <div class="field"><label for="n-det">${t("Details")}</label><textarea class="in" id="n-det" dir="auto" placeholder="${t("Describe what you need")}"></textarea></div>
+   <button class="btn" data-a="submitItem" data-k="${kind}" data-v="${x.id}">${kind==="service"?t("Book service"):t("Submit request")}</button>`,`${esc(LANG==="ar"?x.en:x.ar)} · ${esc(unitLabel(unit()))}`)},
  pick(el){el.parentNode.querySelectorAll("button").forEach(b=>b.classList.toggle("on",b===el))},
- submitItem:el=>busy(el,async()=>{const kind=el.dataset.k;const when=kind==="service"?`${val("n-date")} ${document.querySelector("#slot .on")?.textContent||""}`:null;
+ submitItem:el=>busy(el,async()=>{const kind=el.dataset.k;const when=kind==="service"?`${val("n-date")} ${document.querySelector("#slot .on")?.dataset.v||""}`:null;
    await q(sb.from("requests").insert({kind,type:el.dataset.v,details:val("n-det")||null,preferred_when:when,unit_id:unit().id}));
-   closeSheet();tmp[kind==="request"?"rtab":"stab"]="Open";await refresh();toast(kind==="service"?"Service booked":"Request submitted")}),
- newPass(){if(unit()?.status!=="approved")return toast("Available after your unit is approved");
-   sheet("Create gate pass",`
-   <div class="field"><label for="p-g">Guest name</label><input class="in" id="p-g" placeholder="Guest full name"></div>
-   <div class="field"><label for="p-d">Visit date</label><input class="in" id="p-d" type="date" min="${today()}" value="${today()}"></div>
-   <div class="field"><label>Valid for</label><div class="seg" id="pv">${["One visit","Full day","One week"].map((s,i)=>`<button class="${i===0?"on":""}" data-a="pick">${s}</button>`).join("")}</div></div>
-   <div class="field"><label for="p-c">Car plate (optional)</label><input class="in" id="p-c" placeholder="ا ب ج 123"></div>
-   <div class="err" id="perr"></div><button class="btn cta" data-a="savePass">Generate pass</button>`)},
- savePass:el=>busy(el,async()=>{const g=val("p-g");if(!g){document.getElementById("perr").textContent="Enter the guest's name.";return}
-   const p=await q(sb.from("gate_passes").insert({guest:g,visit_date:val("p-d"),valid_for:document.querySelector("#pv .on").textContent,car_plate:val("p-c")||null,unit_id:unit().id}).select("id").single());
+   closeSheet();tmp[kind==="request"?"rtab":"stab"]="Open";await refresh();toast(kind==="service"?t("Service booked"):t("Request submitted"))}),
+ newPass(){if(unit()?.status!=="approved")return toast(t("Available after your unit is approved"));
+   sheet(t("Create new gate pass"),`
+   <div class="field"><label for="p-g">${t("Guest name")}</label><input class="in" id="p-g" dir="auto" placeholder="${t("Guest full name")}"></div>
+   <div class="field"><label for="p-d">${t("Visit date")}</label><input class="in" id="p-d" type="date" min="${today()}" value="${today()}"></div>
+   <div class="field"><label>${t("Valid for")}</label><div class="seg" id="pv">${["One visit","Full day","One week"].map((s,i)=>`<button class="${i===0?"on":""}" data-a="pick" data-v="${s}">${t(s)}</button>`).join("")}</div></div>
+   <div class="field"><label for="p-c">${t("Car plate (optional)")}</label><input class="in" id="p-c" placeholder="ا ب ج 123"></div>
+   <div class="err" id="perr"></div><button class="btn cta" data-a="savePass">${t("Generate pass")}</button>`)},
+ savePass:el=>busy(el,async()=>{const g=val("p-g");if(!g){document.getElementById("perr").textContent=t("Enter the guest's name.");return}
+   const p=await q(sb.from("gate_passes").insert({guest:g,visit_date:val("p-d"),valid_for:document.querySelector("#pv .on").dataset.v,car_plate:val("p-c")||null,unit_id:unit().id}).select("id").single());
    closeSheet();await refresh();A.showPass({dataset:{v:p.id}})}),
  showPass(el){const p=D.passes.find(x=>x.id===el.dataset.v);if(!p)return;
-   sheet("Gate pass",`<div class="badge"><div class="qr" id="pqr"></div><div class="kv"><div><small>Guest</small><b>${esc(p.guest)}</b></div><div><small>Date</small><b>${fmtDate(p.visit_date)}</b></div><div><small>Host unit</small><b>${esc(p.units?.unit_no)}</b></div><div><small>Valid</small><b>${esc(p.valid_for)}</b></div></div></div>
-   <p class="note">Take a screenshot and send it to your guest. Security scans the code at the gate.</p>`,esc(p.units?.communities?.name));
+   sheet(t("Gate Pass"),`<div class="badge"><div class="qr" id="pqr"></div><div class="kv"><div><small>${t("Guest")}</small><b>${esc(p.guest)}</b></div><div><small>${t("Date")}</small><b>${fmtDate(p.visit_date)}</b></div><div><small>${t("Host unit")}</small><b>${esc(p.units?.unit_no)}</b></div><div><small>${t("Valid")}</small><b>${esc(t(p.valid_for))}</b></div></div></div>
+   <p class="note">${t("Take a screenshot and send it to your guest. Security scans the code at the gate.")}</p>`,esc(p.units?.communities?.name));
    qr(document.getElementById("pqr"),"HUB-PASS:"+p.id)},
- notifyGate:el=>busy(el,async()=>{if(unit()?.status!=="approved")return toast("Available after your unit is approved");const n=val("g-name");if(!n)return toast("Enter the company or driver name");
-   await q(sb.from("gate_notes").insert({kind:tmp.gtype||"Delivery",name:n,plate:val("g-plate")||null,unit_id:unit().id}));await refresh();toast("Gate notified")}),
- newComplaint(){sheet("New complaint",`<div class="field"><label for="c-cat">Category</label>${selHTML("c-cat","Choose a category",COMPLAINT_CATS)}</div>
-   <div class="field"><label for="c-t">What happened?</label><textarea class="in" id="c-t" dir="auto" placeholder="Describe the issue, place and time"></textarea></div>
-   <div class="err" id="cerr"></div><button class="btn" data-a="saveComplaint">Submit complaint</button>`)},
- saveComplaint:el=>busy(el,async()=>{const c=val("c-cat"),t=val("c-t");if(!c||!t){document.getElementById("cerr").textContent="Choose a category and describe the issue.";return}
-   await q(sb.from("complaints").insert({category:c,body:t,unit_id:unit().id}));closeSheet();await refresh();toast("Complaint submitted")}),
+ notifyGate:el=>busy(el,async()=>{if(unit()?.status!=="approved")return toast(t("Available after your unit is approved"));const n=val("g-name");if(!n)return toast(t("Enter the company or driver name"));
+   await q(sb.from("gate_notes").insert({kind:tmp.gtype||"Delivery",name:n,plate:val("g-plate")||null,unit_id:unit().id}));await refresh();toast(t("Gate notified"))}),
+ newComplaint(){sheet(t("New complaint"),`<div class="field"><label for="c-cat">${t("Category")}</label>${selHTML("c-cat",t("Choose a category"),COMPLAINT_CATS.map(c=>[c,t(c)]))}</div>
+   <div class="field"><label for="c-t">${t("What happened?")}</label><textarea class="in" id="c-t" dir="auto" placeholder="${t("Describe the issue, place and time")}"></textarea></div>
+   <div class="err" id="cerr"></div><button class="btn" data-a="saveComplaint">${t("Submit complaint")}</button>`)},
+ saveComplaint:el=>busy(el,async()=>{const c=val("c-cat"),tx=val("c-t");if(!c||!tx){document.getElementById("cerr").textContent=t("Choose a category and describe the issue.");return}
+   await q(sb.from("complaints").insert({category:c,body:tx,unit_id:unit().id}));closeSheet();await refresh();toast(t("Complaint submitted"))}),
  editProfile(){tmp={rel:D.profile.relation};go("profile",{editing:true})},
- askDelete(){sheet("Delete your account?",`<p style="line-height:1.5;margin:0 0 16px">This permanently removes your profile, units, passes, requests and complaints. You will need to sign in and register again.</p><button class="btn" style="background:var(--red);box-shadow:none" data-a="doDelete">Delete my account</button><div style="height:10px"></div><button class="btn ghost" data-a="closeSheet">Keep my account</button>`)},
+ askDelete(){sheet(t("Delete your account?"),`<p style="line-height:1.5;margin:0 0 16px">${t("This permanently removes your profile, units, passes, requests and complaints. You will need to sign in and register again.")}</p><button class="btn" style="background:var(--red);box-shadow:none" data-a="doDelete">${t("Delete my account")}</button><div style="height:10px"></div><button class="btn ghost" data-a="closeSheet">${t("Keep my account")}</button>`)},
  doDelete:el=>busy(el,async()=>{const {error}=await sb.rpc("delete_my_account");if(error)throw error;await sb.auth.signOut();closeSheet();stack=[];boot()}),
  logout:async()=>{closeDrawer();await sb.auth.signOut();stack=[];tmp={};boot()},
- /* manager */
- setUnitStatus:el=>busy(el,async()=>{await q(sb.from("units").update({status:el.dataset.s}).eq("id",el.dataset.v));await refresh();toast(el.dataset.s==="approved"?"Resident approved":"Request rejected")}),
- setStatus:el=>busy(el,async()=>{await q(sb.from(el.dataset.k).update({status:el.dataset.s}).eq("id",el.dataset.v));await refresh();toast("Marked "+el.dataset.s.toLowerCase())}),
- publish:el=>busy(el,async()=>{const c=val("m-pc"),t=val("m-post");if(!c)return toast("Choose the community");if(!t)return toast("Write the announcement first");
-   await q(sb.from("updates").insert({community_id:c,body:t}));await refresh();toast("Update published")}),
- delUpdate:el=>busy(el,async()=>{await q(sb.from("updates").delete().eq("id",el.dataset.v));await refresh();toast("Update deleted")}),
- issueViolation:el=>busy(el,async()=>{const u=val("m-vu"),r=val("m-vr"),f=val("m-vf");if(!u||!r)return toast("Choose the unit and enter a reason");
-   if(f&&!/^\d+(\.\d+)?$/.test(f))return toast("Fine must be a number");
-   await q(sb.from("violations").insert({unit_id:u,reason:r,fine:f?Number(f):null,status:f?"Unpaid":"Open"}));await refresh();toast("Violation issued")}),
- editComm(el){const c=D.communities.find(x=>x.id===el.dataset.v)||{};const f=(id,l,v,ph,mode="tel")=>`<div class="field"><label for="${id}">${l}</label><input class="in" id="${id}" value="${esc(v||"")}" placeholder="${ph}" ${mode?`inputmode="${mode}"`:""}></div>`;
-   sheet(c.id?"Edit community":"Add community",`
-   <div class="field"><label for="k-d">District</label><input class="in" id="k-d" list="k-dl" value="${esc(c.district||"")}" placeholder="e.g. North Coast"><datalist id="k-dl">${districts().map(d=>`<option value="${esc(d)}">`).join("")}</datalist></div>
-   ${f("k-n","Community name",c.name,"e.g. Marina Bay Village","")}
-   ${f("k-cc","Call center",c.call_center,"e.g. 16xxx")}${f("k-s","Security gate",c.security_phone,"010…")}${f("k-o","Management office",c.office_phone,"02…")}${f("k-m","Maintenance",c.maintenance_phone,"011…")}
-   <div class="field"><label for="k-g">Community guidelines</label><textarea class="in" id="k-g" dir="auto" placeholder="Rules residents should follow">${esc(c.guidelines||"")}</textarea></div>
-   <div class="err" id="kerr"></div><button class="btn" data-a="saveComm" data-v="${c.id||""}">${c.id?"Save changes":"Add community"}</button>
-   ${c.id?`<div style="height:10px"></div><button class="btn danger" data-a="askDelComm" data-v="${c.id}">Delete community</button>`:""}`)},
- saveComm:el=>busy(el,async()=>{const row={district:val("k-d"),name:val("k-n"),call_center:val("k-cc")||null,security_phone:val("k-s")||null,office_phone:val("k-o")||null,maintenance_phone:val("k-m")||null,guidelines:val("k-g")||null};
-   if(!row.district||!row.name){document.getElementById("kerr").textContent="Enter the district and community name.";return}
+ setUnitStatus:el=>busy(el,async()=>{await q(sb.from("units").update({status:el.dataset.s}).eq("id",el.dataset.v));await refresh();toast(el.dataset.s==="approved"?t("Resident approved"):t("Request rejected"))}),
+ setStatus:el=>busy(el,async()=>{await q(sb.from(el.dataset.k).update({status:el.dataset.s}).eq("id",el.dataset.v));await refresh();toast(t("Marked {s}",{s:t(el.dataset.s)}))}),
+ publish:el=>busy(el,async()=>{const c=val("m-pc"),tx=val("m-post");if(!c)return toast(t("Choose the community"));if(!tx)return toast(t("Write the announcement first"));
+   await q(sb.from("updates").insert({community_id:c,body:tx}));await refresh();toast(t("Update published"))}),
+ delUpdate:el=>busy(el,async()=>{await q(sb.from("updates").delete().eq("id",el.dataset.v));await refresh();toast(t("Update deleted"))}),
+ issueViolation:el=>busy(el,async()=>{const u=val("m-vu"),r=val("m-vr"),f=val("m-vf");if(!u||!r)return toast(t("Choose the unit and enter a reason"));
+   if(f&&!/^\d+(\.\d+)?$/.test(f))return toast(t("Fine must be a number"));
+   await q(sb.from("violations").insert({unit_id:u,reason:r,fine:f?Number(f):null,status:f?"Unpaid":"Open"}));await refresh();toast(t("Violation issued"))}),
+ editComm(el){const c=D.communities.find(x=>x.id===el.dataset.v)||{};const f=(id,l,v,ph,mode="tel",hint="")=>`<div class="field"><label for="${id}">${l}</label><input class="in" id="${id}" value="${esc(v||"")}" placeholder="${ph}" ${mode?`inputmode="${mode}" dir="ltr"`:""}>${hint?`<span class="sub" style="font-size:12px;padding:0 4px">${hint}</span>`:""}</div>`;
+   sheet(c.id?t("Edit community"):t("Add community"),`
+   <div class="field"><label for="k-d">${t("District")}</label><input class="in" id="k-d" list="k-dl" value="${esc(c.district||"")}" placeholder="${t("e.g. North Coast")}"><datalist id="k-dl">${districts().map(d=>`<option value="${esc(d)}">`).join("")}</datalist></div>
+   ${f("k-n",t("Community name"),c.name,t("e.g. Marina Bay Village"),"")}
+   ${f("k-wa",t("WhatsApp customer service"),c.whatsapp?"+"+c.whatsapp:"","+20 10 1234 5678","tel",t("With country code, e.g. 201012345678"))}
+   ${f("k-cc",t("Call center"),c.call_center,"16xxx")}${f("k-s",t("Security gate"),c.security_phone,"010…")}${f("k-o",t("Management office"),c.office_phone,"02…")}${f("k-m",t("Maintenance"),c.maintenance_phone,"011…")}
+   <div class="field"><label for="k-g">${t("Community guidelines")}</label><textarea class="in" id="k-g" dir="auto" placeholder="${t("Rules residents should follow")}">${esc(c.guidelines||"")}</textarea></div>
+   <div class="err" id="kerr"></div><button class="btn" data-a="saveComm" data-v="${c.id||""}">${c.id?t("Save changes"):t("Add community")}</button>
+   ${c.id?`<div style="height:10px"></div><button class="btn danger" data-a="askDelComm" data-v="${c.id}">${t("Delete community")}</button>`:""}`)},
+ saveComm:el=>busy(el,async()=>{const wa=val("k-wa")?waNum(val("k-wa")):null;
+   const row={district:val("k-d"),name:val("k-n"),whatsapp:wa,call_center:val("k-cc")||null,security_phone:val("k-s")||null,office_phone:val("k-o")||null,maintenance_phone:val("k-m")||null,guidelines:val("k-g")||null};
+   if(!row.district||!row.name){document.getElementById("kerr").textContent=t("Enter the district and community name.");return}
+   if(wa&&!/^\d{8,15}$/.test(wa)){document.getElementById("kerr").textContent=t("With country code, e.g. 201012345678");return}
    if(el.dataset.v)await q(sb.from("communities").update(row).eq("id",el.dataset.v));else await q(sb.from("communities").insert(row));
-   closeSheet();await refresh();toast(el.dataset.v?"Community saved":"Community added")}),
- askDelComm(el){sheet("Delete community?",`<p style="line-height:1.5;margin:0 0 16px">This also removes every unit, request, complaint, pass and update linked to it. This can't be undone.</p><button class="btn" style="background:var(--red);box-shadow:none" data-a="delComm" data-v="${el.dataset.v}">Delete community</button><div style="height:10px"></div><button class="btn ghost" data-a="closeSheet">Cancel</button>`)},
- delComm:el=>busy(el,async()=>{await q(sb.from("communities").delete().eq("id",el.dataset.v));closeSheet();await refresh();toast("Community deleted")}),
+   closeSheet();await refresh();toast(el.dataset.v?t("Community saved"):t("Community added"))}),
+ askDelComm(el){sheet(t("Delete community?"),`<p style="line-height:1.5;margin:0 0 16px">${t("This also removes every unit, request, complaint, pass and update linked to it. This can't be undone.")}</p><button class="btn" style="background:var(--red);box-shadow:none" data-a="delComm" data-v="${el.dataset.v}">${t("Delete community")}</button><div style="height:10px"></div><button class="btn ghost" data-a="closeSheet">${t("Cancel")}</button>`)},
+ delComm:el=>busy(el,async()=>{await q(sb.from("communities").delete().eq("id",el.dataset.v));closeSheet();await refresh();toast(t("Community deleted"))}),
 };
-const origNotifs=V.notifs;V.notifs=()=>{const unread=D.notifs.filter(n=>!n.read).map(n=>n.id);
-  if(unread.length)sb.from("notifications").update({read:true}).in("id",unread).then(()=>D.notifs.forEach(n=>n.read=true));return origNotifs()};
 
 document.addEventListener("click",e=>{const el=e.target.closest("[data-a]");if(!el)return;const f=A[el.dataset.a];if(f){e.preventDefault();f(el)}});
 document.addEventListener("change",e=>{if(e.target.id==="f-district"){tmp.district=e.target.value;tmp.comm="";tmp.unit=val("f-unit");render()}if(e.target.id==="f-comm")tmp.comm=e.target.value});
