@@ -401,7 +401,7 @@ const AR={
 "In progress":"جاري التنفيذ","Closed":"مغلق","Unpaid":"غير مدفوعة","Paid":"مدفوعة","Today":"اليوم","Yesterday":"أمس","{n} days ago":"منذ {n} يوم",
 "Security":"الأمن","Cleanliness":"النظافة","Landscaping":"الزراعة والحدائق","Noise":"الإزعاج","Parking":"الجراجات والركن","Facilities":"المرافق","Other":"أخرى",
 "Hello, I'm {n} from {c} · Unit {u}.":"السلام عليكم، أنا {n} من {c} · وحدة {u}.","Contact management on WhatsApp":"تواصل مع الإدارة على واتساب",
-"Choose your language":"اختار اللغة","Managers":"المديرين","Manager's Gmail":"جيميل المدير","Add manager":"إضافة مدير","Remove":"إزالة","You":"أنت",
+"Choose your language":"اختار اللغة","Contact person (name / title)":"مسؤول التواصل (الاسم / الصفة)","e.g. Mr. Taha — Union president":"مثال: أ. طه — رئيس الاتحاد","Call":"اتصال","Contact on WhatsApp":"تواصل على واتساب","Managers":"المديرين","Manager's Gmail":"جيميل المدير","Add manager":"إضافة مدير","Remove":"إزالة","You":"أنت",
 "Signed up":"سجّل في التطبيق","Not signed up yet":"لم يسجل بعد","Manager added. They get manager access when they sign in with this Gmail.":"تمت إضافة المدير. هيبقى مدير أول ما يدخل بالجيميل ده.",
 "Manager removed":"تمت إزالة المدير","Remove this manager?":"إزالة المدير؟","They will become a regular resident and lose access to the manager panel.":"هيتحول لساكن عادي ومش هيقدر يدخل لوحة الإدارة.",
 "Enter a valid Gmail address":"اكتب عنوان جيميل صحيح","Only people you add here can manage the app.":"الأشخاص اللي تضيفهم هنا بس هم اللي يقدروا يديروا التطبيق.",
@@ -503,7 +503,7 @@ const unitChip=()=>`<div class="unitchip"><span class="unitline">${I("home")}${e
 const empty=(ic,txt)=>`<div class="empty">${I(ic)}${txt}</div>`;
 const needUnit=()=>`<div class="empty">${I("building")}${t("Add your unit first to use this.")}<div style="height:14px"></div><button class="btn small" data-a="addUnit">${I("plus")}${t("Add a unit")}</button></div>`;
 const langSwitch=()=>`<div class="langsw"><button class="${LANG==="ar"?"on":""}" data-a="setLang" data-v="ar">العربية</button><button class="${LANG==="en"?"on":""}" data-a="setLang" data-v="en">English</button></div>`;
-const waCard=c=>c?.whatsapp?`<a class="wa" href="${waLink(c)}" target="_blank" rel="noopener">${WA}<span><b>${t("Chat with customer service")}</b><small>${t("on WhatsApp")} · <bdi>+${esc(waNum(c.whatsapp))}</bdi></small></span>${I("right","flip")}</a>`:"";
+const waCard=c=>c?.whatsapp?`<a class="wa" href="${waLink(c)}" target="_blank" rel="noopener">${WA}<span><b>${c.contact_name?esc(c.contact_name):t("Chat with customer service")}</b><small>${t("on WhatsApp")} · <bdi>+${esc(waNum(c.whatsapp))}</bdi></small></span>${I("right","flip")}</a>`:"";
 
 /* ---------- screens ---------- */
 const V={};
@@ -640,7 +640,7 @@ V.directory=()=>{const c=comm();if(!c)return `${topbar(t("Phone Directory"))}<di
  const nums=[["Security gate",c.security_phone,"shield"],["Management office",c.office_phone,"building"],["Maintenance",c.maintenance_phone,"wrench"]].filter(x=>x[1]);
  return `${topbar(t("Phone Directory"))}<div class="body">
  <div class="hero" style="flex-direction:column;text-align:center">${hubMark("sm")}<b style="font-size:20px">${t("{c} Call Center",{c:esc(c.name)})}</b>${c.call_center?`<a href="tel:${esc(c.call_center)}" dir="ltr" style="font-size:28px;font-weight:900;color:var(--teal);text-decoration:none;font-variant-numeric:tabular-nums">${esc(c.call_center)}</a><span class="link">${t("Tap to call")}</span>`:`<span class="sub">${t("Not added yet")}</span>`}</div>
- ${c.whatsapp?`<div style="margin-top:12px">${waCard(c)}</div>`:""}
+ ${c.whatsapp?`<div style="margin-top:12px">${waCard(c)}</div><a class="row" href="tel:+${esc(waNum(c.whatsapp))}" style="color:inherit;text-decoration:none;margin-top:10px">${I("phone")}<div class="t"><b>${esc(c.contact_name||t("Contact on WhatsApp"))}</b><span dir="ltr" style="font-size:15px;color:var(--ink);text-align:start">+${esc(waNum(c.whatsapp))}</span></div><span class="btn small">${t("Call")}</span></a>`:""}
  <div class="sec"><h2>${t("Short numbers")}</h2></div>
  ${nums.map(([l,n,ic])=>`<a class="row" href="tel:${esc(n)}" style="color:inherit;text-decoration:none">${I(ic)}<div class="t"><b>${t(l)}</b><span dir="ltr" style="font-size:15px;color:var(--ink);font-variant-numeric:tabular-nums;text-align:start">${esc(n)}</span></div>${I("phone")}</a>`).join("")||empty("phone",t("The management hasn't added numbers yet."))}</div>`};
 
@@ -800,12 +800,13 @@ const A={
    <div class="field"><label for="k-d">${t("District")}</label><input class="in" id="k-d" list="k-dl" value="${esc(c.district||"")}" placeholder="${t("e.g. North Coast")}"><datalist id="k-dl">${districts().map(d=>`<option value="${esc(d)}">`).join("")}</datalist></div>
    ${f("k-n",t("Community name"),c.name,t("e.g. Marina Bay Village"),"")}
    ${f("k-wa",t("WhatsApp customer service"),c.whatsapp?"+"+c.whatsapp:"","+20 10 1234 5678","tel",t("With country code, e.g. 201012345678"))}
+   ${f("k-cn",t("Contact person (name / title)"),c.contact_name,t("e.g. Mr. Taha — Union president"),"")}
    ${f("k-cc",t("Call center"),c.call_center,"16xxx")}${f("k-s",t("Security gate"),c.security_phone,"010…")}${f("k-o",t("Management office"),c.office_phone,"02…")}${f("k-m",t("Maintenance"),c.maintenance_phone,"011…")}
    <div class="field"><label for="k-g">${t("Community guidelines")}</label><textarea class="in" id="k-g" dir="auto" placeholder="${t("Rules residents should follow")}">${esc(c.guidelines||"")}</textarea></div>
    <div class="err" id="kerr"></div><button class="btn" data-a="saveComm" data-v="${c.id||""}">${c.id?t("Save changes"):t("Add community")}</button>
    ${c.id?`<div style="height:10px"></div><button class="btn danger" data-a="askDelComm" data-v="${c.id}">${t("Delete community")}</button>`:""}`)},
  saveComm:el=>busy(el,async()=>{const wa=val("k-wa")?waNum(val("k-wa")):null;
-   const row={district:val("k-d"),name:val("k-n"),whatsapp:wa,call_center:val("k-cc")||null,security_phone:val("k-s")||null,office_phone:val("k-o")||null,maintenance_phone:val("k-m")||null,guidelines:val("k-g")||null};
+   const row={district:val("k-d"),name:val("k-n"),whatsapp:wa,contact_name:val("k-cn")||null,call_center:val("k-cc")||null,security_phone:val("k-s")||null,office_phone:val("k-o")||null,maintenance_phone:val("k-m")||null,guidelines:val("k-g")||null};
    if(!row.district||!row.name){document.getElementById("kerr").textContent=t("Enter the district and community name.");return}
    if(wa&&!/^\d{8,15}$/.test(wa)){document.getElementById("kerr").textContent=t("With country code, e.g. 201012345678");return}
    if(el.dataset.v)await q(sb.from("communities").update(row).eq("id",el.dataset.v));else await q(sb.from("communities").insert(row));
