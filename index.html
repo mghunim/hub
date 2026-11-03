@@ -415,7 +415,7 @@ const AR={
 "In progress":"جاري التنفيذ","Closed":"مغلق","Unpaid":"غير مدفوعة","Paid":"مدفوعة","Today":"اليوم","Yesterday":"أمس","{n} days ago":"منذ {n} يوم",
 "Security":"الأمن","Cleanliness":"النظافة","Landscaping":"الزراعة والحدائق","Noise":"الإزعاج","Parking":"المواقف والجراجات","Facilities":"المرافق","Other":"أخرى",
 "Hello, I'm {n} from {c} · Unit {u}.":"السلام عليكم، أنا {n} من {c} · وحدة {u}.","Contact management on WhatsApp":"تواصل مع الإدارة على واتساب",
-"Choose your language":"اختر اللغة","Delete":"حذف","Deleted":"المحذوفات","Active":"الحالية","Restore":"استعادة","Restored":"تمت الاستعادة","Reopen":"إعادة فتح","Moved to Deleted":"نُقل إلى المحذوفات","No deleted items.":"لا توجد عناصر محذوفة.","Deleted on {d}":"حُذف في {d}","Delete this item?":"حذف هذا العنصر؟","It moves to the Deleted tab. You can restore it from there.":"سيُنقل إلى تبويب المحذوفات، ويمكنك استعادته من هناك.","You are signed in as security staff.":"أنت مسجَّل الدخول بصفتك من فريق الأمن.","Gate scanner":"ماسح البوابة","Scan a guest pass or resident badge":"امسح تصريح ضيف أو بطاقة ساكن","Start scanning":"ابدأ المسح","Stop camera":"إيقاف الكاميرا",
+"Choose your language":"اختر اللغة","Attachment":"مرفق","Tap to open the PDF":"اضغط لفتح ملف PDF","Tap to open":"اضغط للفتح","Attach a PDF or image (optional)":"إرفاق ملف PDF أو صورة (اختياري)","Choose file: newsletter, announcement…":"اختر ملفًا: نشرة، أو إعلان…","Write the announcement or attach a file":"اكتب الإعلان أو أرفق ملفًا","File is larger than 15 MB":"حجم الملف أكبر من ١٥ ميجابايت","Delete":"حذف","Deleted":"المحذوفات","Active":"الحالية","Restore":"استعادة","Restored":"تمت الاستعادة","Reopen":"إعادة فتح","Moved to Deleted":"نُقل إلى المحذوفات","No deleted items.":"لا توجد عناصر محذوفة.","Deleted on {d}":"حُذف في {d}","Delete this item?":"حذف هذا العنصر؟","It moves to the Deleted tab. You can restore it from there.":"سيُنقل إلى تبويب المحذوفات، ويمكنك استعادته من هناك.","You are signed in as security staff.":"أنت مسجَّل الدخول بصفتك من فريق الأمن.","Gate scanner":"ماسح البوابة","Scan a guest pass or resident badge":"امسح تصريح ضيف أو بطاقة ساكن","Start scanning":"ابدأ المسح","Stop camera":"إيقاف الكاميرا",
 "Or enter the code manually":"أو أدخل الرمز يدويًا","Check code":"تحقق من الرمز","Recent scans":"آخر عمليات المسح","No scans yet.":"لا توجد عمليات مسح بعد.","Entry allowed":"مسموح بالدخول","Entry not allowed":"غير مسموح بالدخول",
 "Code not recognised":"رمز غير معروف","Pass or badge not found":"التصريح أو البطاقة غير موجودة","Unit not approved":"الوحدة غير معتمدة","Pass is for a later date":"التصريح لتاريخ لاحق","Pass expired":"انتهت صلاحية التصريح","Pass already used":"تم استخدام التصريح من قبل",
 "Scan next":"مسح التالي","Camera not available. Allow camera access in your browser settings.":"الكاميرا غير متاحة. اسمح للمتصفح باستخدام الكاميرا من الإعدادات.","Guest pass":"تصريح ضيف","Resident badge":"بطاقة ساكن","Car plate":"لوحة السيارة","Allowed":"مسموح","Not allowed":"غير مسموح",
@@ -524,8 +524,8 @@ async function uploadDoc(input){
     await q(sb.from("unit_documents").insert({unit_id:unitId,kind,path}));
     for(const o of old){await sb.from("unit_documents").delete().eq("id",o.id);await sb.storage.from("unit-docs").remove([o.path])}
     await load();render();toast(t("Uploaded"))}catch(e){toast(e.message||t("Something went wrong"));render()}}
-async function openDoc(path){sheet(t("Document"),`<p class="sub">${t("Loading…")}</p>`);
-  const {data,error}=await sb.storage.from("unit-docs").createSignedUrl(path,900);if(error){closeSheet();return toast(error.message)}
+async function openDoc(path,bucket="unit-docs",title){sheet(title||t("Document"),`<p class="sub">${t("Loading…")}</p>`);
+  const {data,error}=await sb.storage.from(bucket).createSignedUrl(path,3600);if(error){closeSheet();return toast(error.message)}
   const u=data.signedUrl,pdf=/\.pdf$/i.test(path);const box=document.querySelector("#sheetIn .sb");if(!box)return;
   box.innerHTML=(pdf?`<div class="empty" style="padding:24px 10px">${I("book")}PDF</div>`:`<a href="${u}" target="_blank" rel="noopener"><img src="${u}" alt="" style="width:100%;max-height:60vh;object-fit:contain;border-radius:12px;display:block;margin-bottom:12px;background:var(--field)"></a>`)
    +`<a class="btn" href="${u}" target="_blank" rel="noopener">${pdf?t("Open PDF"):t("Open in full screen")}</a><div style="height:10px"></div><button class="btn ghost" data-a="closeSheet">${t("Close")}</button>`}
@@ -621,7 +621,8 @@ V.submitted=()=>{const u=unit();const c=comm();return `
  <div class="foot"><div class="steps" style="margin-bottom:16px"><i class="on"></i><i class="on"></i><i class="on"></i></div><button class="btn" data-a="tab" data-v="home">${t("Go to home")}</button></div>`};
 
 const myUpdates=()=>{const c=comm();return c?D.updates.filter(x=>x.community_id===c.id):[]};
-const postHTML=p=>`<article class="post"><div class="who"><span class="avatar">${initials(p.author)}</span><div><b style="font-size:14.5px">${esc(p.author==="Management office"?t("Management office"):p.author)}</b><div class="sub" style="font-size:12px">${ago(p.created_at)}</div></div></div><p dir="auto">${esc(p.body)}</p></article>`;
+const newsFile=p=>`<button class="row" data-a="viewNews" data-v="${esc(p.file_path)}" style="width:100%;margin:10px 0 0;text-align:start;background:var(--field)">${I(/\.pdf$/i.test(p.file_path)?"book":"clip")}<div class="t"><b dir="auto">${esc(p.file_name||t("Attachment"))}</b><span>${/\.pdf$/i.test(p.file_path)?t("Tap to open the PDF"):t("Tap to open")}</span></div>${I("right","flip")}</button>`;
+const postHTML=p=>`<article class="post"><div class="who"><span class="avatar">${initials(p.author)}</span><div><b style="font-size:14.5px">${esc(p.author==="Management office"?t("Management office"):p.author)}</b><div class="sub" style="font-size:12px">${ago(p.created_at)}</div></div></div>${p.body?`<p dir="auto">${esc(p.body)}</p>`:""}${p.file_path?newsFile(p):""}</article>`;
 V.home=()=>{const u=unit();const c=comm();const unread=unreadN();const first=(D.profile.full_name||"").split(" ")[0];
  const head=`<header class="top"><button class="iconbtn" data-a="drawer" aria-label="Menu">${I("menu")}</button>
   <button data-a="switchUnit" style="display:flex;align-items:center;justify-content:center;gap:4px;font-weight:800;font-size:17px;min-width:0">${esc(c?.name||"HUB")}${I("down")}</button>
@@ -793,13 +794,14 @@ V.manager=()=>{if(!isMgr())return V.home();
   if(!cs.length)inner=empty("building",t("Add a community first."));
   else inner=`<div class="field"><label for="m-pc">${t("Community")}</label>${selHTML("m-pc",t("Choose community"),cs,cs.length===1?cs[0][0]:"")}</div>
   <div class="field"><label for="m-post">${t("Announcement")}</label><textarea class="in" id="m-post" dir="auto" placeholder="${t("e.g. The pool opens Friday at 9 am.")}"></textarea></div>
+  <div class="field"><label>${t("Attach a PDF or image (optional)")}</label><label class="btn ghost" style="cursor:pointer;margin:0">${I("clip")}<span id="m-pfn">${t("Choose file: newsletter, announcement…")}</span><input type="file" id="m-pf" accept="application/pdf,image/*" hidden></label></div>
   <button class="btn cta" data-a="publish">${t("Publish update")}</button>
   <div class="sec"><h2>${t("Issue a violation")}</h2></div>
   ${D.m.units.some(u=>u.status==="approved")?`<div class="field"><label for="m-vu">${t("Unit")}</label>${selHTML("m-vu",t("Choose unit"),D.m.units.filter(u=>u.status==="approved").map(u=>[u.id,`${u.communities?.name} · ${u.unit_no} · ${u.profiles?.full_name||""}`]))}</div>
   <div class="field"><label for="m-vr">${t("Reason")}</label><input class="in" id="m-vr" dir="auto" placeholder="${t("e.g. Parking in fire lane")}"></div>
   <div class="field"><label for="m-vf">${t("Fine (EGP, optional)")}</label><input class="in" id="m-vf" dir="ltr" inputmode="numeric" placeholder="500"></div>
   <button class="btn ghost" data-a="issueViolation">${t("Issue violation")}</button>`:empty("shield",t("Violations can be issued once residents are approved."))}
-  <div class="sec"><h2>${t("Recent updates")}</h2></div>${D.updates.slice(0,10).map(p=>`<div class="row"><div class="t"><b>${esc(p.communities?.name)}</b><span dir="auto">${esc(p.body)}</span><span>${ago(p.created_at)}</span></div><button class="iconbtn" data-a="delUpdate" data-v="${p.id}" aria-label="Delete">${I("trash")}</button></div>`).join("")||empty("megaphone",t("Nothing published yet."))}`}
+  <div class="sec"><h2>${t("Recent updates")}</h2></div>${D.updates.slice(0,10).map(p=>`<div class="row"><div class="t"><b>${esc(p.communities?.name)}</b><span dir="auto">${esc(p.body)}${p.file_path?` · ${I("clip")}${esc(p.file_name||"")}`:""}</span><span>${ago(p.created_at)}</span></div><button class="iconbtn" data-a="delUpdate" data-v="${p.id}" aria-label="Delete">${I("trash")}</button></div>`).join("")||empty("megaphone",t("Nothing published yet."))}`}
  if(tb==="Communities")inner=`<button class="btn" data-a="editComm" style="margin-bottom:16px">${I("plus")}${t("Add community")}</button>`+(D.communities.map(c=>`<button class="row" data-a="editComm" data-v="${c.id}">${I("building")}<div class="t"><b>${esc(c.name)}</b><span>${esc(c.district)} · ${t("{n} approved units",{n:D.m.units.filter(u=>u.community_id===c.id&&u.status==="approved").length})}${c.whatsapp?" · "+t("WhatsApp")+" ✓":""}</span></div>${I("right","flip")}</button>`).join("")||empty("building",t("No communities yet. Residents can register once you add one.")));
  if(tb==="Managers"){const me=(D.profile.email||"").toLowerCase();
   inner=`<p class="sub" style="margin:0 0 12px">${t("Only people you add here can manage the app.")}</p>
@@ -936,9 +938,13 @@ const A={
  delItem:el=>busy(el,async()=>{const {error}=await sb.rpc("set_item_deleted",{p_kind:el.dataset.k,p_id:el.dataset.v,p_deleted:true});if(error)throw error;closeSheet();await refresh();toast(t("Moved to Deleted"))}),
  restoreItem:el=>busy(el,async()=>{const {error}=await sb.rpc("set_item_deleted",{p_kind:el.dataset.k,p_id:el.dataset.v,p_deleted:false});if(error)throw error;await refresh();toast(t("Restored"))}),
  setStatus:el=>busy(el,async()=>{await q(sb.from(el.dataset.k).update({status:el.dataset.s}).eq("id",el.dataset.v));await refresh();toast(t("Marked {s}",{s:t(el.dataset.s)}))}),
- publish:el=>busy(el,async()=>{const c=val("m-pc"),tx=val("m-post");if(!c)return toast(t("Choose the community"));if(!tx)return toast(t("Write the announcement first"));
-   await q(sb.from("updates").insert({community_id:c,body:tx}));await refresh();toast(t("Update published"))}),
- delUpdate:el=>busy(el,async()=>{await q(sb.from("updates").delete().eq("id",el.dataset.v));await refresh();toast(t("Update deleted"))}),
+ publish:el=>busy(el,async()=>{const c=val("m-pc"),tx=val("m-post"),f=document.getElementById("m-pf")?.files?.[0];if(!c)return toast(t("Choose the community"));if(!tx&&!f)return toast(t("Write the announcement or attach a file"));
+   let row={community_id:c,body:tx||""};
+   if(f){if(f.size>15*1024*1024)return toast(t("File is larger than 15 MB"));const ext=(f.name.split(".").pop()||"pdf").toLowerCase().replace(/[^a-z0-9]/g,"");const path=`${c}/${Date.now()}.${ext}`;
+    const {error}=await sb.storage.from("news-files").upload(path,f,{contentType:f.type||"application/pdf"});if(error)throw error;row.file_path=path;row.file_name=f.name}
+   await q(sb.from("updates").insert(row));await refresh();toast(t("Update published"))}),
+ viewNews(el){openDoc(el.dataset.v,"news-files",t("Attachment"))},
+ delUpdate:el=>busy(el,async()=>{const up=D.updates.find(x=>x.id===el.dataset.v);await q(sb.from("updates").delete().eq("id",el.dataset.v));if(up?.file_path)try{await sb.storage.from("news-files").remove([up.file_path])}catch(e){}await refresh();toast(t("Update deleted"))}),
  issueViolation:el=>busy(el,async()=>{const u=val("m-vu"),r=val("m-vr"),f=val("m-vf");if(!u||!r)return toast(t("Choose the unit and enter a reason"));
    if(f&&!/^\d+(\.\d+)?$/.test(f))return toast(t("Fine must be a number"));
    await q(sb.from("violations").insert({unit_id:u,reason:r,fine:f?Number(f):null,status:f?"Unpaid":"Open"}));await refresh();toast(t("Violation issued"))}),
@@ -968,7 +974,7 @@ document.addEventListener("click",e=>{const el=e.target.closest("[data-a]");if(!
 document.addEventListener("visibilitychange",async()=>{if(document.visibilityState!=="visible"||!D.session||!D.profile)return;
  if(!["home","manager","gate","notifs"].includes(route.name)||document.querySelector("#sheet.on"))return;try{await load();render()}catch(e){}});
 setInterval(async()=>{if(document.visibilityState!=="visible"||!D.session||!D.profile||!["home","manager","gate"].includes(route.name)||document.querySelector("#sheet.on,input:focus,textarea:focus"))return;try{await load();render()}catch(e){}},60000);
-document.addEventListener("change",e=>{if(e.target.matches("input[type=file][data-doc]"))return uploadDoc(e.target);if(e.target.id==="f-district"){tmp.district=e.target.value;tmp.comm="";tmp.unit=val("f-unit");render()}if(e.target.id==="f-comm")tmp.comm=e.target.value});
+document.addEventListener("change",e=>{if(e.target.id==="m-pf"){const n=document.getElementById("m-pfn");if(n)n.textContent=e.target.files?.[0]?.name||t("Choose file: newsletter, announcement…");return}if(e.target.matches("input[type=file][data-doc]"))return uploadDoc(e.target);if(e.target.id==="f-district"){tmp.district=e.target.value;tmp.comm="";tmp.unit=val("f-unit");render()}if(e.target.id==="f-comm")tmp.comm=e.target.value});
 $("#scrim").addEventListener("click",closeDrawer);$("#scrim2").addEventListener("click",closeSheet);
 sb.auth.onAuthStateChange((ev)=>{if(ev==="SIGNED_IN"&&route.name==="welcome")boot()});
 const qs=new URLSearchParams(location.search);if(qs.get("error_description"))setTimeout(()=>toast(qs.get("error_description")),400);
