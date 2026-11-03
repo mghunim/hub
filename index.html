@@ -402,7 +402,10 @@ const AR={
 "In progress":"جاري التنفيذ","Closed":"مغلق","Unpaid":"غير مدفوعة","Paid":"مدفوعة","Today":"اليوم","Yesterday":"أمس","{n} days ago":"منذ {n} يوم",
 "Security":"الأمن","Cleanliness":"النظافة","Landscaping":"الزراعة والحدائق","Noise":"الإزعاج","Parking":"الجراجات والركن","Facilities":"المرافق","Other":"أخرى",
 "Hello, I'm {n} from {c} · Unit {u}.":"السلام عليكم، أنا {n} من {c} · وحدة {u}.","Contact management on WhatsApp":"تواصل مع الإدارة على واتساب",
-"Choose your language":"اختار اللغة","Facebook group":"جروب فيسبوك","Join our Facebook group":"انضم لجروب الكمبوند على فيسبوك","News, photos and discussions":"أخبار وصور ونقاشات السكان","Facebook group link":"رابط جروب الفيسبوك","Residents ({n})":"السكان ({n})","Edit":"تعديل","Edit resident":"تعديل بيانات الساكن","Remove resident?":"إزالة الساكن؟",
+"Choose your language":"اختار اللغة","National ID number (14 digits)":"الرقم القومي (١٤ رقم)","Enter your 14-digit national ID number.":"اكتب الرقم القومي كامل (١٤ رقم).","This national ID number is not valid.":"الرقم القومي ده مش صحيح.","National ID":"الرقم القومي","Waiting for approval":"في انتظار الموافقة","Under review":"قيد المراجعة","Not approved":"لم تتم الموافقة",
+"The app unlocks after the management approves your unit.":"التطبيق هيتفتح بعد ما الإدارة توافق على الوحدة.","Upload the remaining documents first.":"ارفع باقي المستندات الأول.",
+"All documents uploaded. The management is reviewing them.":"كل المستندات اتّرفعت. الإدارة بتراجعها دلوقتي.","Check status":"تحديث الحالة","Still waiting for approval":"لسه في انتظار الموافقة",
+"Contact the management if you think this is a mistake.":"تواصل مع الإدارة لو شايف إن في خطأ.","Register another unit":"تسجيل وحدة آخر","Facebook group":"جروب فيسبوك","Join our Facebook group":"انضم لجروب الكمبوند على فيسبوك","News, photos and discussions":"أخبار وصور ونقاشات السكان","Facebook group link":"رابط جروب الفيسبوك","Residents ({n})":"السكان ({n})","Edit":"تعديل","Edit resident":"تعديل بيانات الساكن","Remove resident?":"إزالة الساكن؟",
 "This removes their unit registration and uploaded documents. Their account stays, and they can register again.":"ده هيشيل تسجيل الوحدة والمستندات المرفوعة. حسابه هيفضل موجود ويقدر يسجل تاني.",
 "Resident updated":"تم تحديث بيانات الساكن","Resident removed":"تمت إزالة الساكن","Chalets and owners":"الشاليهات والملاك","Search chalet or owner":"ابحث برقم الشاليه أو اسم المالك",
 "Add chalet":"إضافة شاليه","Edit chalet":"تعديل الشاليه","Owner name":"اسم المالك","Chalet saved":"تم حفظ الشاليه","Chalet deleted":"تم حذف الشاليه","Delete chalet":"حذف الشاليه",
@@ -469,7 +472,7 @@ async function load(){
 }
 async function loadMgr(){
   const [units,requests,complaints]=await Promise.all([
-    q(sb.from("units").select("*, profiles(full_name,phone,relation,email), communities(name,district)").order("created_at",{ascending:false})),
+    q(sb.from("units").select("*, profiles(full_name,phone,relation,email,national_id), communities(name,district)").order("created_at",{ascending:false})),
     q(sb.from("requests").select("*, units(unit_no, communities(name)), profiles(full_name,phone)").neq("status","Closed").order("created_at",{ascending:false})),
     q(sb.from("complaints").select("*, units(unit_no, communities(name)), profiles(full_name,phone)").neq("status","Closed").order("created_at",{ascending:false})),
   ]);
@@ -482,7 +485,7 @@ let stack=[],route={name:"loading"},tmp={};
 function go(name,params={},push=true){if(push&&route)stack.push(route);route={name,...params};closeDrawer();render()}
 function back(){route=stack.pop()||{name:isMgr()&&!unit()?"manager":"home"};render()}
 function home(tab){stack=[];route={name:tab||(isMgr()&&!unit()?"manager":"home")};render()}
-function needsProfile(){const p=D.profile;return !p.full_name||!p.phone||(!isMgr()&&!p.relation)}
+function needsProfile(){const p=D.profile;return !p.full_name||!p.phone||(!isMgr()&&(!p.relation||!p.national_id))}
 async function boot(){
   route={name:"loading"};render();
   const {data}=await sb.auth.getSession();D.session=data.session;
@@ -539,7 +542,7 @@ V.profile=()=>{const p=D.profile;const mgr=isMgr();return `
   <div class="field"><label for="f-email">${t("Google account")}</label><input class="in" id="f-email" dir="ltr" value="${esc(p.email)}" disabled></div>
   <div class="field"><label for="f-phone">${t("Mobile number")}</label><input class="in" id="f-phone" dir="ltr" inputmode="tel" value="${esc(p.phone??"")}" placeholder="01x xxxx xxxx" autocomplete="tel"></div>
   ${mgr?"":`<div class="field"><label>${t("You are the unit's")}</label>${segs("rel",["Owner","Tenant","Family"])}</div>
-  <div class="field"><label for="f-nid">${t("National ID (last 4 digits)")}</label><input class="in" id="f-nid" dir="ltr" inputmode="numeric" maxlength="4" value="${esc(p.nid_last4??"")}" placeholder="••••"></div>`}
+  <div class="field"><label for="f-nid">${t("National ID number (14 digits)")}</label><input class="in" id="f-nid" dir="ltr" inputmode="numeric" maxlength="14" autocomplete="off" value="${esc(p.national_id??"")}" placeholder="2XXXXXXXXXXXXX"></div>`}
   <div class="err" id="err"></div>
  </div>
  <div class="foot"><button class="btn" data-a="saveProfile">${route.editing?t("Save"):t("Next")}</button></div>`};
@@ -591,6 +594,18 @@ V.home=()=>{const u=unit();const c=comm();const unread=D.notifs.some(n=>!n.read)
   <div class="sec"><h2>${t("Community Updates")}</h2>${ups.length>3?`<button class="link" data-a="go" data-v="updates">${t("View All ›")}</button>`:""}</div>
   ${ups.slice(0,3).map(postHTML).join("")||empty("megaphone",t("No updates yet. News from your management will show here."))}
  </div>${tabs("home")}`};
+V.gate=()=>{const c=D.communities.find(x=>D.units.some(u=>u.community_id===x.id))||D.communities[0];
+ return `<header class="top"><span></span><h1>${t("Waiting for approval")}</h1><button class="iconbtn" data-a="go" data-v="profileView" aria-label="${t("My account")}">${I("user")}</button></header>
+ <div class="body">
+  <div style="display:flex;justify-content:center;margin:4px 0 14px">${hubMark()}</div>
+  <p class="lead" style="margin-bottom:16px">${t("The app unlocks after the management approves your unit.")}</p>
+  ${D.units.map(u=>{const need=false;const n=0;return `<div class="row" style="flex-wrap:wrap">${I(u.status==="rejected"?"alert":"clip")}<div class="t"><b>${esc(unitLabel(u))}</b><span>${u.status==="rejected"?t("Not approved")+" · "+t("Contact the management if you think this is a mistake."):(need&&n<3?t("{n} of 3 uploaded",{n})+" · "+t("Upload the remaining documents first."):need?t("All documents uploaded. The management is reviewing them."):t("Under review"))}</span></div>${pill(u.status)}${need&&u.status!=="rejected"?`<div class="sel-row" style="width:100%"><button class="btn small ${n<3?"":"ghost"}" data-a="goDocs" data-v="${u.id}">${I("clip")}${t("Upload documents")}</button></div>`:""}</div>`}).join("")}
+  <button class="btn" data-a="checkStatus" style="margin:8px 0 16px">${t("Check status")}</button>
+  ${c?.whatsapp?waCard(c):""}
+  <div style="display:flex;justify-content:center;margin-top:18px">${langSwitch()}</div>
+  <div style="display:flex;gap:10px;margin-top:18px"><button class="btn ghost" data-a="addUnit">${I("plus")}${t("Register another unit")}</button></div>
+  <button class="btn danger" data-a="logout" style="margin-top:10px">${t("Sign out")}</button>
+ </div>`};
 V.updates=()=>`${topbar(t("Community Updates"))}<div class="body">${myUpdates().map(postHTML).join("")||empty("megaphone",t("No updates yet."))}</div>`;
 
 const typeOf=id=>[...REQUEST_TYPES,...SERVICES].find(x=>x.id===id)||{en:id,ar:id};
@@ -678,7 +693,7 @@ V.profileView=()=>`${topbar(t("My account"))}<div class="body">
 V.manager=()=>{if(!isMgr())return V.home();
  const pend=D.m.units.filter(u=>u.status==="pending");const tb=tmp.mtab||"Approvals";let inner="";
  if(tb==="Approvals"){
-  inner=pend.map(u=>`<div class="row" style="flex-wrap:wrap"><span class="avatar">${initials(u.profiles?.full_name)}</span><div class="t"><b>${esc(u.profiles?.full_name||u.profiles?.email)}</b><span>${esc(u.communities?.name)} · ${t("Unit {u}",{u:esc(u.unit_no)})} · ${t(u.unit_type)}</span><span>${esc(t(u.profiles?.relation||""))} · <bdi>${esc(u.profiles?.phone||"")}</bdi> · <bdi>${esc(u.profiles?.email||"")}</bdi></span></div><div class="sel-row" style="width:100%;margin-top:4px"><button class="btn small" data-a="setUnitStatus" data-v="${u.id}" data-s="approved">${I("check")}${t("Approve")}</button><button class="btn small ghost" data-a="setUnitStatus" data-v="${u.id}" data-s="rejected">${t("Reject")}</button></div></div>`).join("")||empty("users",t("No residents waiting for approval."));
+  inner=pend.map(u=>`<div class="row" style="flex-wrap:wrap"><span class="avatar">${initials(u.profiles?.full_name)}</span><div class="t"><b>${esc(u.profiles?.full_name||u.profiles?.email)}</b><span>${esc(u.communities?.name)} · ${t("Unit {u}",{u:esc(u.unit_no)})} · ${t(u.unit_type)}</span><span>${esc(t(u.profiles?.relation||""))} · <bdi>${esc(u.profiles?.phone||"")}</bdi> · <bdi>${esc(u.profiles?.email||"")}</bdi></span><span>${t("National ID")}: <bdi>${esc(u.profiles?.national_id||"—")}</bdi></span></div><div class="sel-row" style="width:100%;margin-top:4px"><button class="btn small" data-a="setUnitStatus" data-v="${u.id}" data-s="approved">${I("check")}${t("Approve")}</button><button class="btn small ghost" data-a="setUnitStatus" data-v="${u.id}" data-s="rejected">${t("Reject")}</button></div></div>`).join("")||empty("users",t("No residents waiting for approval."));
   const appr=D.m.units.filter(u=>u.status==="approved");
   const others=D.m.units.filter(u=>u.status!=="pending");
   if(others.length)inner+=`<div class="sec"><h2>${t("Residents ({n})",{n:others.length})}</h2></div>`+others.map(u=>`<div class="row" style="flex-wrap:wrap"><span class="avatar">${initials(u.profiles?.full_name)}</span><div class="t"><b>${esc(u.profiles?.full_name||u.profiles?.email)}</b><span>${esc(unitLabel(u))} · <bdi>${esc(u.profiles?.phone||"")}</bdi></span>${u.village_units?.village_unit_owners?.owner_name?`<span>${t("Registered owner")}: ${esc(u.village_units.village_unit_owners.owner_name)}</span>`:""}</div>${pill(u.status)}<div class="sel-row" style="width:100%"><button class="btn small ghost" data-a="editRes" data-v="${u.id}">${t("Edit")}</button><button class="btn small danger" data-a="askDelRes" data-v="${u.id}">${t("Remove")}</button></div></div>`).join("");
@@ -710,6 +725,7 @@ V.manager=()=>{if(!isMgr())return V.home();
 const DOCK={national_id:"National ID card",contract:"Chalet contract",maintenance_receipt:"Last maintenance fee receipt"};
 const docsOfM=u=>(u?.unit_documents)||[];
 const MGR_ACTIONS={
+ checkStatus:el=>busy(el,async()=>{await load();if(locked()){render();toast(t("Still waiting for approval"))}else home("home")}),
  editRes(el){const u=D.m.units.find(x=>x.id===el.dataset.v);if(!u)return;const have=docsOfM(u);
    const unitField=`<div class="field"><label for="r-un">${t("Unit number (e.g. 1-23-3)")}</label><input class="in" id="r-un" dir="ltr" value="${esc(u.unit_no)}"></div>`;
    sheet(t("Edit resident"),`<p style="margin:0 0 12px"><b>${esc(u.profiles?.full_name||"")}</b><br><span class="sub" dir="ltr">${esc(u.profiles?.email||"")} · ${esc(u.profiles?.phone||"")}</span></p>
@@ -742,7 +758,10 @@ function sheet(title,body,sub=""){$("#sheetIn").innerHTML=`<div class="sh"><h3>$
 function closeSheet(){$("#sheet").classList.remove("on");$("#scrim2").classList.remove("on")}
 let tt;function toast(m){const el=$("#toast");el.textContent=m;el.classList.add("on");clearTimeout(tt);tt=setTimeout(()=>el.classList.remove("on"),2600)}
 function qr(el,text){if(!el)return;el.innerHTML="";try{new QRCode(el,{text,width:168,height:168,colorDark:"#102A43",colorLight:"#ffffff"})}catch(e){el.textContent=text}}
-function render(){$("#screen").innerHTML=(V[route.name]||V.home)();
+const OPEN_ROUTES=["welcome","loading","error","profile","community","docs","submitted","gate","profileView"];
+const locked=()=>D.profile&&!isMgr()&&!D.units.some(u=>u.status==="approved");
+function render(){if(locked()&&!OPEN_ROUTES.includes(route.name)){stack=[];route={name:D.units.length?"gate":"community"}}
+ $("#screen").innerHTML=(V[route.name]||V.home)();
  if(route.name==="badge"&&unit()?.status==="approved")qr(document.getElementById("qr"),"HUB-BADGE:"+unit().id);
  const b=document.querySelector("#screen .body");if(b)b.scrollTop=0}
 const err=m=>{const e=document.getElementById("err");if(e)e.textContent=m};
@@ -764,8 +783,11 @@ const A={
  google:el=>busy(el,async()=>{const {error}=await sb.auth.signInWithOAuth({provider:"google",options:{redirectTo:location.origin+location.pathname}});if(error)throw error}),
  saveProfile:el=>busy(el,async()=>{const name=val("f-name"),phone=val("f-phone").replace(/[\s-]/g,"");
    if(!name)return err(t("Enter your full name."));if(!/^(\+?20|0020)?0?1[0125]\d{8}$/.test(phone))return err(t("Enter an Egyptian mobile number, e.g. 01012345678."));
-   const nid=val("f-nid");if(nid&&!/^\d{4}$/.test(nid))return err(t("Enter exactly 4 digits for the national ID."));
-   const patch={full_name:name,phone,lang:LANG};if(!isMgr()){patch.relation=tmp.rel||D.profile.relation||"Owner";patch.nid_last4=nid||null}
+   const nid=val("f-nid").replace(/[٠-٩]/g,d=>"٠١٢٣٤٥٦٧٨٩".indexOf(d)).replace(/\D/g,"");
+   if(!isMgr()){if(nid.length!==14)return err(t("Enter your 14-digit national ID number."));
+     const y=(nid[0]==="2"?1900:2000)+ +nid.slice(1,3),m=+nid.slice(3,5),dd=+nid.slice(5,7),dt=new Date(y,m-1,dd);
+     if(!/^[23]/.test(nid)||dt.getMonth()!==m-1||dt.getDate()!==dd||dt>new Date())return err(t("This national ID number is not valid."))}
+   const patch={full_name:name,phone,lang:LANG};if(!isMgr()){patch.relation=tmp.rel||D.profile.relation||"Owner";patch.national_id=nid}
    D.profile=await q(sb.from("profiles").update(patch).eq("id",D.profile.id).select().single());
    if(route.editing){back();toast(t("Profile saved"))}else{tmp={};boot()}}),
  saveUnit:el=>busy(el,async()=>{const cid=val("f-comm"),u=val("f-unit");
