@@ -430,7 +430,8 @@ const AR={
 "Register your unit":"سجّل وحدتك","Add another unit":"إضافة وحدة أخرى","Request":"طلب","Requested {d}":"بتاريخ {d}",
 };
 Object.assign(AR,{});
-const t=(s,v={})=>{let r=(LANG==="ar"&&AR[s])||s;for(const k in v)r=r.replace("{"+k+"}",v[k]);return r};
+const arNum=x=>String(x).replace(/[0-9]/g,d=>"٠١٢٣٤٥٦٧٨٩"[d]);
+const t=(s,v={})=>{let r=(LANG==="ar"&&AR[s])||s;for(const k in v)r=r.replace("{"+k+"}",LANG==="ar"&&typeof v[k]==="number"?arNum(v[k]):v[k]);return r};
 function applyLang(){document.documentElement.lang=LANG;document.documentElement.dir=LANG==="ar"?"rtl":"ltr"}
 applyLang();
 const FAQ_AR=[
