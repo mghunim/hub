@@ -410,7 +410,7 @@ const AR={
 "In progress":"جاري التنفيذ","Closed":"مغلق","Unpaid":"غير مدفوعة","Paid":"مدفوعة","Today":"اليوم","Yesterday":"أمس","{n} days ago":"منذ {n} يوم",
 "Security":"الأمن","Cleanliness":"النظافة","Landscaping":"الزراعة والحدائق","Noise":"الإزعاج","Parking":"المواقف والجراجات","Facilities":"المرافق","Other":"أخرى",
 "Hello, I'm {n} from {c} · Unit {u}.":"السلام عليكم، أنا {n} من {c} · وحدة {u}.","Contact management on WhatsApp":"تواصل مع الإدارة على واتساب",
-"Choose your language":"اختر اللغة","Gate scanner":"ماسح البوابة","Scan a guest pass or resident badge":"امسح تصريح ضيف أو بطاقة ساكن","Start scanning":"ابدأ المسح","Stop camera":"إيقاف الكاميرا",
+"Choose your language":"اختر اللغة","You are signed in as security staff.":"أنت مسجَّل الدخول بصفتك من فريق الأمن.","Gate scanner":"ماسح البوابة","Scan a guest pass or resident badge":"امسح تصريح ضيف أو بطاقة ساكن","Start scanning":"ابدأ المسح","Stop camera":"إيقاف الكاميرا",
 "Or enter the code manually":"أو أدخل الرمز يدويًا","Check code":"تحقق من الرمز","Recent scans":"آخر عمليات المسح","No scans yet.":"لا توجد عمليات مسح بعد.","Entry allowed":"مسموح بالدخول","Entry not allowed":"غير مسموح بالدخول",
 "Code not recognised":"رمز غير معروف","Pass or badge not found":"التصريح أو البطاقة غير موجودة","Unit not approved":"الوحدة غير معتمدة","Pass is for a later date":"التصريح لتاريخ لاحق","Pass expired":"انتهت صلاحية التصريح","Pass already used":"تم استخدام التصريح من قبل",
 "Scan next":"مسح التالي","Camera not available. Allow camera access in your browser settings.":"الكاميرا غير متاحة. اسمح للمتصفح باستخدام الكاميرا من الإعدادات.","Guest pass":"تصريح ضيف","Resident badge":"بطاقة ساكن","Car plate":"لوحة السيارة","Allowed":"مسموح","Not allowed":"غير مسموح",
@@ -575,12 +575,12 @@ V.welcome=()=>`
   <p class="note" style="margin-top:0">${t("By continuing you agree to our")} <a href="privacy.html" style="color:var(--teal);font-weight:800">${t("Privacy Policy")}</a>.</p>
  </div>`;
 
-V.profile=()=>{const p=D.profile;const mgr=isMgr();return `
+V.profile=()=>{const p=D.profile;const mgr=isMgr()||isSec();return `
  ${topbar(route.editing?t("Edit profile"):t("Complete your profile"),{noBack:!route.editing,right:route.editing?"<span></span>":""})}
  <div class="body">
   ${route.editing?"":`<div style="display:flex;justify-content:center;margin-bottom:12px">${langSwitch()}</div>`}
   ${route.editing||mgr?"":'<div class="steps"><i class="on"></i><i></i><i></i></div>'}
-  <p class="lead">${mgr?t("You are signed in as the app manager."):t("Tell us who you are so the management can verify you.")}</p>
+  <p class="lead">${isSec()?t("You are signed in as security staff."):mgr?t("You are signed in as the app manager."):t("Tell us who you are so the management can verify you.")}</p>
   <div class="field"><label for="f-name">${t("Full name")}</label><input class="in" id="f-name" value="${esc(p.full_name??"")}" placeholder="${t("Full name")}" autocomplete="name"></div>
   <div class="field"><label for="f-email">${t("Google account")}</label><input class="in" id="f-email" dir="ltr" value="${esc(p.email)}" disabled></div>
   <div class="field"><label for="f-phone">${t("Mobile number")}</label><input class="in" id="f-phone" dir="ltr" inputmode="tel" value="${esc(p.phone??"")}" placeholder="01x xxxx xxxx" autocomplete="tel"></div>
@@ -874,7 +874,7 @@ const A={
  saveProfile:el=>busy(el,async()=>{const name=val("f-name"),phone=val("f-phone").replace(/[\s-]/g,"");
    if(!name)return err(t("Enter your full name."));if(!/^(\+?20|0020)?0?1[0125]\d{8}$/.test(phone))return err(t("Enter an Egyptian mobile number, e.g. 01012345678."));
    
-   const patch={full_name:name,phone,lang:LANG};if(!isMgr()){patch.relation=tmp.rel||D.profile.relation||"Owner";}
+   const patch={full_name:name,phone,lang:LANG};if(D.profile.role==="resident"){patch.relation=tmp.rel||D.profile.relation||"Owner";}
    D.profile=await q(sb.from("profiles").update(patch).eq("id",D.profile.id).select().single());
    if(route.editing){back();toast(t("Profile saved"))}else{tmp={};boot()}}),
  saveUnit:el=>busy(el,async()=>{const cid=val("f-comm"),u=val("f-unit");
