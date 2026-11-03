@@ -401,7 +401,11 @@ const AR={
 "In progress":"جاري التنفيذ","Closed":"مغلق","Unpaid":"غير مدفوعة","Paid":"مدفوعة","Today":"اليوم","Yesterday":"أمس","{n} days ago":"منذ {n} يوم",
 "Security":"الأمن","Cleanliness":"النظافة","Landscaping":"الزراعة والحدائق","Noise":"الإزعاج","Parking":"الجراجات والركن","Facilities":"المرافق","Other":"أخرى",
 "Hello, I'm {n} from {c} · Unit {u}.":"السلام عليكم، أنا {n} من {c} · وحدة {u}.","Contact management on WhatsApp":"تواصل مع الإدارة على واتساب",
-"Choose your language":"اختار اللغة","Request":"طلب","Requested {d}":"بتاريخ {d}",
+"Choose your language":"اختار اللغة","Managers":"المديرين","Manager's Gmail":"جيميل المدير","Add manager":"إضافة مدير","Remove":"إزالة","You":"أنت",
+"Signed up":"سجّل في التطبيق","Not signed up yet":"لم يسجل بعد","Manager added. They get manager access when they sign in with this Gmail.":"تمت إضافة المدير. هيبقى مدير أول ما يدخل بالجيميل ده.",
+"Manager removed":"تمت إزالة المدير","Remove this manager?":"إزالة المدير؟","They will become a regular resident and lose access to the manager panel.":"هيتحول لساكن عادي ومش هيقدر يدخل لوحة الإدارة.",
+"Enter a valid Gmail address":"اكتب عنوان جيميل صحيح","Only people you add here can manage the app.":"الأشخاص اللي تضيفهم هنا بس هم اللي يقدروا يديروا التطبيق.",
+"Register your unit":"سجّل وحدتك","Add another unit":"إضافة وحدة أخرى","Request":"طلب","Requested {d}":"بتاريخ {d}",
 };
 const t=(s,v={})=>{let r=(LANG==="ar"&&AR[s])||s;for(const k in v)r=r.replace("{"+k+"}",v[k]);return r};
 function applyLang(){document.documentElement.lang=LANG;document.documentElement.dir=LANG==="ar"?"rtl":"ltr"}
@@ -464,6 +468,7 @@ async function loadMgr(){
     q(sb.from("requests").select("*, units(unit_no, communities(name)), profiles(full_name,phone)").neq("status","Closed").order("created_at",{ascending:false})),
     q(sb.from("complaints").select("*, units(unit_no, communities(name)), profiles(full_name,phone)").neq("status","Closed").order("created_at",{ascending:false})),
   ]);
+  try{D.mgrs=await q(sb.rpc("list_managers"))}catch(e){D.mgrs=[]}
   D.m={units,requests,complaints};
 }
 
@@ -533,9 +538,9 @@ V.profile=()=>{const p=D.profile;const mgr=isMgr();return `
  <div class="foot"><button class="btn" data-a="saveProfile">${route.editing?t("Save"):t("Next")}</button></div>`};
 
 V.community=()=>{const d=tmp.district||"";const list=D.communities.filter(c=>c.district===d);const adding=route.adding||D.units.length;
- if(!D.communities.length)return `${topbar(t("Add a new community"),{noBack:!adding})}<div class="body">${empty("building",t("No communities are open for registration yet.")+"<br>"+t("The management will add yours soon."))}</div><div class="foot"><button class="btn ghost" data-a="boot">${t("Check again")}</button></div>`;
+ if(!D.communities.length)return `${topbar(t("Register your unit"),{noBack:!adding})}<div class="body">${empty("building",t("No communities are open for registration yet.")+"<br>"+t("The management will add yours soon."))}</div><div class="foot"><button class="btn ghost" data-a="boot">${t("Check again")}</button></div>`;
  return `
- ${topbar(adding?t("Add a new unit"):t("Add a new community"),{noBack:!adding})}
+ ${topbar(adding?t("Add another unit"):t("Register your unit"),{noBack:!adding})}
  <div class="body">
   ${adding?"":'<div class="steps"><i class="on"></i><i class="on"></i><i></i></div>'}
   <p class="lead">${t("Enter your community")}<br>${t("and unit info.")}</p>
@@ -683,10 +688,21 @@ V.manager=()=>{if(!isMgr())return V.home();
   <button class="btn ghost" data-a="issueViolation">${t("Issue violation")}</button>`:empty("shield",t("Violations can be issued once residents are approved."))}
   <div class="sec"><h2>${t("Recent updates")}</h2></div>${D.updates.slice(0,10).map(p=>`<div class="row"><div class="t"><b>${esc(p.communities?.name)}</b><span dir="auto">${esc(p.body)}</span><span>${ago(p.created_at)}</span></div><button class="iconbtn" data-a="delUpdate" data-v="${p.id}" aria-label="Delete">${I("trash")}</button></div>`).join("")||empty("megaphone",t("Nothing published yet."))}`}
  if(tb==="Communities")inner=`<button class="btn" data-a="editComm" style="margin-bottom:16px">${I("plus")}${t("Add community")}</button>`+(D.communities.map(c=>`<button class="row" data-a="editComm" data-v="${c.id}">${I("building")}<div class="t"><b>${esc(c.name)}</b><span>${esc(c.district)} · ${t("{n} approved units",{n:D.m.units.filter(u=>u.community_id===c.id&&u.status==="approved").length})}${c.whatsapp?" · "+t("WhatsApp")+" ✓":""}</span></div>${I("right","flip")}</button>`).join("")||empty("building",t("No communities yet. Residents can register once you add one.")));
+ if(tb==="Managers"){const me=(D.profile.email||"").toLowerCase();
+  inner=`<p class="sub" style="margin:0 0 12px">${t("Only people you add here can manage the app.")}</p>
+  <div class="field"><label for="m-em">${t("Manager's Gmail")}</label><input class="in" id="m-em" type="email" dir="ltr" placeholder="name@gmail.com" autocomplete="off"></div>
+  <button class="btn" data-a="addMgr">${I("plus")}${t("Add manager")}</button>
+  <div class="sec"><h2>${t("Managers")}</h2></div>`+(D.mgrs||[]).map(m=>`<div class="row"><span class="avatar">${esc((m.email||"?")[0].toUpperCase())}</span><div class="t"><b dir="ltr" style="text-align:start">${esc(m.email)}</b><span>${m.email===me?t("You"):(m.signed_up?t("Signed up"):t("Not signed up yet"))}</span></div>${m.email===me?pill("Active"):`<button class="btn small ghost" data-a="askDelMgr" data-v="${esc(m.email)}">${t("Remove")}</button>`}</div>`).join("")}
  return `${topbar(t("Manager panel"),{noBack:true,right:`<button class="iconbtn" data-a="drawer" aria-label="Menu">${I("menu")}</button>`})}<div class="body">
  <div class="grid3" style="margin:4px 0 16px"><div class="stat"><b>${pend.length}</b><span>${t("Pending residents")}</span></div><div class="stat"><b>${D.m.requests.length}</b><span>${t("Open requests")}</span></div><div class="stat"><b>${D.m.complaints.length}</b><span>${t("Open complaints")}</span></div></div>
- <div class="hscroll">${segs("mtab",["Approvals","Requests","Post","Communities"])}</div><div style="height:14px"></div>${inner}</div>${tabs("manager")}`};
+ <div class="hscroll">${segs("mtab",["Approvals","Requests","Post","Communities","Managers"])}</div><div style="height:14px"></div>${inner}</div>${tabs("manager")}`};
 
+const MGR_ACTIONS={
+ addMgr:el=>busy(el,async()=>{const em=val("m-em").toLowerCase();if(!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(em))return toast(t("Enter a valid Gmail address"));
+   const {error}=await sb.rpc("add_manager",{p_email:em});if(error)throw error;await refresh();toast(t("Manager added. They get manager access when they sign in with this Gmail."))}),
+ askDelMgr(el){sheet(t("Remove this manager?"),`<p style="line-height:1.5;margin:0 0 6px" dir="ltr">${esc(el.dataset.v)}</p><p style="line-height:1.5;margin:0 0 16px">${t("They will become a regular resident and lose access to the manager panel.")}</p><button class="btn" style="background:var(--red);box-shadow:none" data-a="delMgr" data-v="${esc(el.dataset.v)}">${t("Remove")}</button><div style="height:10px"></div><button class="btn ghost" data-a="closeSheet">${t("Cancel")}</button>`)},
+ delMgr:el=>busy(el,async()=>{const {error}=await sb.rpc("remove_manager",{p_email:el.dataset.v});if(error)throw error;closeSheet();await refresh();toast(t("Manager removed"))}),
+};
 /* ---------- drawer, sheet, toast ---------- */
 function drawerHTML(){const items=[["badge","ID Badge","badge"],["gatepass","Gate Pass","ticket"],["gatenote","Gate Notification","gate"],["requests","Requests","clip"],["complaints","Complaints","chat"],["violations","Violations","shield"],["guidelines","Community Info","book"],["directory","Phone Directory","phone"],["help","Help Center","help"],["properties","Manage properties","building"]];
  const c=comm();
@@ -798,6 +814,7 @@ const A={
  delComm:el=>busy(el,async()=>{await q(sb.from("communities").delete().eq("id",el.dataset.v));closeSheet();await refresh();toast(t("Community deleted"))}),
 };
 
+Object.assign(A,MGR_ACTIONS);
 document.addEventListener("click",e=>{const el=e.target.closest("[data-a]");if(!el)return;const f=A[el.dataset.a];if(f){e.preventDefault();f(el)}});
 document.addEventListener("change",e=>{if(e.target.id==="f-district"){tmp.district=e.target.value;tmp.comm="";tmp.unit=val("f-unit");render()}if(e.target.id==="f-comm")tmp.comm=e.target.value});
 $("#scrim").addEventListener("click",closeDrawer);$("#scrim2").addEventListener("click",closeSheet);
