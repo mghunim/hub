@@ -52,6 +52,11 @@ button{cursor:pointer;border:0;background:none;padding:0}
 .top h1{margin:0;text-align:center;font-size:19px;font-weight:800;text-wrap:balance}
 .iconbtn{width:44px;height:44px;display:grid;place-items:center;border-radius:12px;color:var(--ink);position:relative}
 .iconbtn:active{background:var(--field)}
+.cnt{position:absolute;top:-3px;right:-3px;min-width:19px;height:19px;padding:0 5px;border-radius:10px;background:var(--coral);color:#fff;font-size:11.5px;font-weight:800;line-height:19px;text-align:center;border:2px solid var(--bg);box-sizing:content-box}
+.seg .cnt{position:static;display:inline-block;margin-inline-start:6px;border:0;vertical-align:1px}
+.tab .cnt{top:-2px;right:calc(50% - 26px)}
+[dir=rtl] .cnt{right:auto;left:-3px}[dir=rtl] .seg .cnt{left:auto}[dir=rtl] .tab .cnt{left:calc(50% - 26px);right:auto}
+.iconbtn{position:relative}
 .dot{position:absolute;top:9px;right:10px;width:9px;height:9px;border-radius:50%;background:var(--coral);border:2px solid var(--bg)}
 .hubmark{width:96px;height:96px;border-radius:28px;background:var(--navy);display:grid;place-items:center;flex:none}
 .hubmark svg{width:62%;height:62%}
@@ -545,12 +550,15 @@ async function refresh(){try{await load();render()}catch(e){toast(e.message)}}
 /* ---------- shell ---------- */
 const topbar=(title,o={})=>`<header class="top">${o.noBack?"<span></span>":`<button class="iconbtn" data-a="back" aria-label="Back">${I("left","flip")}</button>`}<h1>${title}</h1>${o.right||"<span></span>"}</header>`;
 function tabs(on){const tb=[["home","Home","home"],["services","Services","grid"],["discover","Discover","compass"]];if(isMgr())tb.push(["manager","Manager","settings"]);
-  return `<nav class="tabs">${tb.map(([k,l,ic])=>`<button class="tab ${on===k?"on":""}" data-a="tab" data-v="${k}">${I(ic)}<span>${t(l)}</span></button>`).join("")}</nav>`}
+  return `<nav class="tabs">${tb.map(([k,l,ic])=>`<button class="tab ${on===k?"on":""}" data-a="tab" data-v="${k}" style="position:relative">${I(ic)}${k==="manager"&&isMgr()?cntB(mgrCounts().total):""}<span>${t(l)}</span></button>`).join("")}</nav>`}
 const PILL={Open:"p-open",pending:"p-open","In progress":"p-prog",approved:"p-ok",Active:"p-ok",Paid:"p-ok",rejected:"p-bad",Unpaid:"p-bad"};
 const LBL={pending:"Pending",approved:"Approved",rejected:"Rejected"};
 const pill=s=>`<span class="pill ${PILL[s]||"p-closed"}">${esc(t(LBL[s]||s))}</span>`;
 const selHTML=(id,ph,opts,v="")=>`<div class="sel"><select id="${id}" required><option value="" ${v?"":"selected"}>${esc(ph)}</option>${opts.map(o=>{const [ov,ol]=Array.isArray(o)?o:[o,o];return `<option value="${esc(ov)}" ${ov===v?"selected":""}>${esc(ol)}</option>`}).join("")}</select>${I("down")}</div>`;
-const segs=(k,list)=>`<div class="seg">${list.map(x=>`<button class="${(tmp[k]||list[0])===x?"on":""}" data-a="seg" data-k="${k}" data-v="${x}">${t(x)}</button>`).join("")}</div>`;
+const cntB=n=>n>0?`<span class="cnt">${n>99?(LANG==="ar"?"+٩٩":"99+"):(LANG==="ar"?arNum(n):n)}</span>`:"";
+const unreadN=()=>(D.notifs||[]).filter(n=>!n.read).length;
+const mgrCounts=()=>{const m=D.m||{units:[],requests:[],complaints:[]};const ap=(m.units||[]).filter(u=>u.status==="pending").length;const rq=(m.requests||[]).filter(r=>r.status==="Open").length+(m.complaints||[]).filter(c=>c.status==="Open").length;return {Approvals:ap,Requests:rq,total:ap+rq}};
+const segs=(k,list,cn={})=>`<div class="seg">${list.map(x=>`<button class="${(tmp[k]||list[0])===x?"on":""}" data-a="seg" data-k="${k}" data-v="${x}">${t(x)}${cntB(cn[x]||0)}</button>`).join("")}</div>`;
 const unitChip=()=>`<div class="unitchip"><span class="unitline">${I("home")}${esc(unitLabel(unit()))}</span></div>`;
 const empty=(ic,txt)=>`<div class="empty">${I(ic)}${txt}</div>`;
 const needUnit=()=>`<div class="empty">${I("building")}${t("Add your unit first to use this.")}<div style="height:14px"></div><button class="btn small" data-a="addUnit">${I("plus")}${t("Add a unit")}</button></div>`;
@@ -614,10 +622,10 @@ V.submitted=()=>{const u=unit();const c=comm();return `
 
 const myUpdates=()=>{const c=comm();return c?D.updates.filter(x=>x.community_id===c.id):[]};
 const postHTML=p=>`<article class="post"><div class="who"><span class="avatar">${initials(p.author)}</span><div><b style="font-size:14.5px">${esc(p.author==="Management office"?t("Management office"):p.author)}</b><div class="sub" style="font-size:12px">${ago(p.created_at)}</div></div></div><p dir="auto">${esc(p.body)}</p></article>`;
-V.home=()=>{const u=unit();const c=comm();const unread=D.notifs.some(n=>!n.read);const first=(D.profile.full_name||"").split(" ")[0];
+V.home=()=>{const u=unit();const c=comm();const unread=unreadN();const first=(D.profile.full_name||"").split(" ")[0];
  const head=`<header class="top"><button class="iconbtn" data-a="drawer" aria-label="Menu">${I("menu")}</button>
   <button data-a="switchUnit" style="display:flex;align-items:center;justify-content:center;gap:4px;font-weight:800;font-size:17px;min-width:0">${esc(c?.name||"HUB")}${I("down")}</button>
-  <button class="iconbtn" data-a="go" data-v="notifs" aria-label="${t("Notifications")}">${I("bell")}${unread?'<span class="dot"></span>':""}</button></header>`;
+  <button class="iconbtn" data-a="go" data-v="notifs" aria-label="${t("Notifications")}">${I("bell")}${cntB(unread)}</button></header>`;
  if(!u)return `${head}<div class="body"><p class="h-hi">${t("Hi, {n}",{n:esc(first)})}</p>${needUnit()}</div>${tabs("home")}`;
  const ups=myUpdates();
  return `${head}
@@ -736,7 +744,7 @@ V.violations=()=>`${topbar(t("Violations"))}<div class="body">
  ${D.violations.map(v=>`<div class="row">${I("shield")}<div class="t"><b dir="auto">${esc(v.reason)}</b><span>${fmtDate(v.created_at)} · ${t("Unit {u}",{u:esc(v.units?.unit_no)})}${v.fine?" · "+t("Fine EGP {f}",{f:esc(v.fine)}):""}</span></div>${pill(v.status)}</div>`).join("")||empty("shield",t("No violations on your units."))}</div>`;
 
 V.notifs=()=>{const unread=D.notifs.filter(n=>!n.read).map(n=>n.id);
- if(unread.length)sb.from("notifications").update({read:true}).in("id",unread).then(()=>D.notifs.forEach(n=>n.read=true));
+ if(unread.length){sb.from("notifications").update({read:true}).in("id",unread).then(()=>{});setTimeout(()=>D.notifs.forEach(n=>n.read=true),0)}
  return `${topbar(t("Notifications"))}<div class="body">${D.notifs.map(n=>{const ti=LANG==="ar"&&n.title_ar?n.title_ar:n.title;const bo=LANG==="ar"&&n.body_ar?n.body_ar:n.body;return `<div class="row" style="${n.read?"":"box-shadow:inset -3px 0 0 var(--coral)"}">${I("bell")}<div class="t"><b>${esc(ti)}</b><span dir="auto">${esc(bo)}</span><span>${ago(n.created_at)}</span></div></div>`}).join("")||empty("bell",t("You're all caught up."))}</div>`};
 
 V.directory=()=>{const c=comm();if(!c)return `${topbar(t("Phone Directory"))}<div class="body">${needUnit()}</div>`;
@@ -799,9 +807,9 @@ V.manager=()=>{if(!isMgr())return V.home();
   <div class="sec"><h2>${t("Managers")}</h2></div>`+(D.mgrs||[]).map(m=>`<div class="row"><span class="avatar">${esc((m.email||"?")[0].toUpperCase())}</span><div class="t"><b dir="ltr" style="text-align:start">${esc(m.email)}</b><span>${m.email===me?t("You"):(m.signed_up?t("Signed up"):t("Not signed up yet"))}</span></div>${m.email===me?pill("Active"):`<button class="btn small ghost" data-a="askDelMgr" data-v="${esc(m.email)}">${t("Remove")}</button>`}</div>`).join("")+`<div class="sec"><h2>${t("Security staff")}</h2></div><p class="sub" style="margin:0 0 12px">${t("Security staff only see the gate scanner.")}</p>
   <div class="field"><label for="m-sec">${t("Security Gmail")}</label><input class="in" id="m-sec" type="email" dir="ltr" placeholder="guard@gmail.com" autocomplete="off"></div>
   <button class="btn ghost" data-a="addSec">${I("plus")}${t("Add security")}</button><div style="height:10px"></div>`+(D.secs||[]).map(m=>`<div class="row"><span class="avatar">${I("shield")}</span><div class="t"><b dir="ltr" style="text-align:start">${esc(m.email)}</b><span>${m.signed_up?t("Signed up"):t("Not signed up yet")}</span></div><button class="btn small ghost" data-a="askDelSec" data-v="${esc(m.email)}">${t("Remove")}</button></div>`).join("")}
- return `${topbar(t("Manager panel"),{noBack:true,right:`<button class="iconbtn" data-a="drawer" aria-label="Menu">${I("menu")}</button>`})}<div class="body">
- <div class="grid3" style="margin:4px 0 16px"><div class="stat"><b>${pend.length}</b><span>${t("Pending residents")}</span></div><div class="stat"><b>${D.m.requests.length}</b><span>${t("Open requests")}</span></div><div class="stat"><b>${D.m.complaints.length}</b><span>${t("Open complaints")}</span></div></div>
- <div class="hscroll">${segs("mtab",["Approvals","Requests","Post","Communities","Managers"])}</div><div style="height:14px"></div>${inner}</div>${tabs("manager")}`};
+ return `${topbar(t("Manager panel"),{noBack:true,right:`<span style="display:flex;gap:4px"><button class="iconbtn" data-a="go" data-v="notifs" aria-label="${t("Notifications")}">${I("bell")}${cntB(unreadN())}</button><button class="iconbtn" data-a="drawer" aria-label="Menu">${I("menu")}</button></span>`})}<div class="body">
+ <div class="grid3" style="margin:4px 0 16px"><div class="stat"><b>${LANG==="ar"?arNum(pend.length):pend.length}</b><span>${t("Pending residents")}</span></div><div class="stat"><b>${(n=>LANG==="ar"?arNum(n):n)(D.m.requests.filter(r=>r.status==="Open").length)}</b><span>${t("Open requests")}</span></div><div class="stat"><b>${(n=>LANG==="ar"?arNum(n):n)(D.m.complaints.filter(c=>c.status==="Open").length)}</b><span>${t("Open complaints")}</span></div></div>
+ <div class="hscroll">${segs("mtab",["Approvals","Requests","Post","Communities","Managers"],mgrCounts())}</div><div style="height:14px"></div>${inner}</div>${tabs("manager")}`};
 
 const DOCK={national_id:"National ID card",contract:"Allocation letter / contract",maintenance_receipt:"Last maintenance fee receipt"};
 const docsOfM=u=>(u?.unit_documents)||[];
@@ -953,6 +961,9 @@ const A={
 
 Object.assign(A,MGR_ACTIONS);
 document.addEventListener("click",e=>{const el=e.target.closest("[data-a]");if(!el)return;const f=A[el.dataset.a];if(f){e.preventDefault();f(el)}});
+document.addEventListener("visibilitychange",async()=>{if(document.visibilityState!=="visible"||!D.session||!D.profile)return;
+ if(!["home","manager","gate","notifs"].includes(route.name)||document.querySelector("#sheet.on"))return;try{await load();render()}catch(e){}});
+setInterval(async()=>{if(document.visibilityState!=="visible"||!D.session||!D.profile||!["home","manager","gate"].includes(route.name)||document.querySelector("#sheet.on,input:focus,textarea:focus"))return;try{await load();render()}catch(e){}},60000);
 document.addEventListener("change",e=>{if(e.target.matches("input[type=file][data-doc]"))return uploadDoc(e.target);if(e.target.id==="f-district"){tmp.district=e.target.value;tmp.comm="";tmp.unit=val("f-unit");render()}if(e.target.id==="f-comm")tmp.comm=e.target.value});
 $("#scrim").addEventListener("click",closeDrawer);$("#scrim2").addEventListener("click",closeSheet);
 sb.auth.onAuthStateChange((ev)=>{if(ev==="SIGNED_IN"&&route.name==="welcome")boot()});
